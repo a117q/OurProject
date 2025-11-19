@@ -41,6 +41,5 @@ cur.execute("""CREATE TABLE Transactions(
             FOREIGN KEY (to_wallet_id) REFERENCES Wallets(Wallet_ID),
             FOREIGN KEY (from_wallet_id) REFERENCES Wallets(Wallet_ID)
         )""")
-
 conn.commit()
 conn.close()
