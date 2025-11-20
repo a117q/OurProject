@@ -29,6 +29,7 @@ class DataBase:
             email      TEXT NOT NULL,
             PhoneNo    INT,
             wallet_id  INT(10),
+            password TEXT  NOT NULL CHECK (LENGTH(password) >= 8),
             FOREIGN KEY (wallet_id) REFERENCES Wallets(Wallet_ID)
         )
         """)
