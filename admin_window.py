@@ -74,7 +74,7 @@ class AdminsWindow:
         conn.close()
 
     def view_selected_balance(self):
-        #show the balance for the chosen emtity 
+        #show the balance for the chosen enntity 
         selection = self.entities_listbox.curselection()
         if not selection:
             messagebox.showerror("Error", "Please select an entity from the list.")
