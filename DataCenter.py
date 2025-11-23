@@ -1,11 +1,12 @@
+# DataCenter.py
 import sqlite3
 
-class DataBase:
-    def __init__(self, DB_name="Database.db"):
+class DataCenter:
+    def __init__(self, db_name="Database.db"):
         # connect to database
-        self.conn = sqlite3.connect(DB_name)
+        self.conn = sqlite3.connect(db_name)     
+        self.conn.execute("PRAGMA foreign_keys = ON")
         self.cur = self.conn.cursor()
-
         # create tables if they don't exist
         self._create_tables()
 
@@ -20,7 +21,7 @@ class DataBase:
         )
         """)
 
-        # Students table
+        # Students table (with password)
         self.cur.execute("""
         CREATE TABLE IF NOT EXISTS Students( 
             Student_ID INT(10) PRIMARY KEY NOT NULL,
@@ -29,7 +30,7 @@ class DataBase:
             email      TEXT NOT NULL,
             PhoneNo    INT,
             wallet_id  INT(10),
-            password TEXT  NOT NULL CHECK (LENGTH(password) >= 8),
+            password   TEXT NOT NULL CHECK (LENGTH(password) >= 8),
             FOREIGN KEY (wallet_id) REFERENCES Wallets(Wallet_ID)
         )
         """)
