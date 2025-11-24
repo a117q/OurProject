@@ -1,67 +1,67 @@
 import tkinter as tk
+# MODIFICATION: Ensure both Admin and Login/Signup classes are imported
 from admin_window import AdminsWindow 
 from LogIn import LogIn
+from SignupWindow import SignupWindow # Assuming SignupWindow is available
 
 class MainApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("Wallet System")
-        self.root.geometry("600x400")
-
-        # firt screen will appear example.log in
-        self.show_login_window()
+        self.root.title("KSU Wallet System")
+        # MODIFICATION: Use a larger geometry for better display (can be adjusted)
+        self.root.geometry("600x600") 
+        
+        # MODIFICATION: The first screen should be Sign Up (based on project flow)
+        self.show_signup_window()
 
     def clear_window(self):
-        # will remove  all the widgets from the window before opening a new screen
-        # شفتو لما نتفح نافذع جديده مابي النوافذ تتكدس على بعض يعني ابي نافذه وحده كل مره لذلك نسوي هذي الداله 
+        # Clears all widgets from the main window before opening a new screen
         for widget in self.root.winfo_children():
             widget.destroy()
 
-# ==================== Login screen -EXAMPLE -   ===============================
-
-    def show_login_window(self):
-        # here is the real log in screen !!!!!!!!!!
+    # ==================== Student and Admin Callbacks ===============================
+    
+    # MODIFICATION: Student window must be able to accept student_id from LogIn.py
+    def show_student_window(self, student_id):
         self.clear_window()
-
-        title = tk.Label(self.root, text="Login Window", font=("Arial", 18))
-        title.pack(pady=20)
-
-        # temprary button for the admin screen 
-        admin_btn = tk.Button(self.root, text="Login as Admin", command=self.show_admin_window)
-        admin_btn.pack(pady=10)
-
-        # another temp button 
-        student_btn = tk.Button(self.root, text="Login as Student", command=self.show_student_window)
-        student_btn.pack(pady=10)
-
-
-    # ====================== admin screen   ==========================
+        # This is a temporary window. Replace with actual StudentWalletWindow initialization later.
+        label = tk.Label(self.root, text=f"Student Wallet Window - ID: {student_id}", font=("Arial", 16))
+        label.pack(pady=50)
+        tk.Button(self.root, text="Go Back to Login", command=self.show_login_window).pack(pady=10)
 
     def show_admin_window(self):
-        # opening the admin window 
         self.clear_window()
-
-        # نرسل للـ AdminWindow:
-        # 1) root
-        # 2) دالة الرجعة show_login_window
-        
+        # Initializes the Admin Window, passing the callback to return to login
         self.admin_window = AdminsWindow(self.root, go_back_callback=self.show_login_window)
 
-    # ==================== STudent screen - EXAMPLE- =====================
 
-    def show_student_window(self):
-        # example ! stdent screen - gui -
+    # ==================== Sign Up screen ===============================
+
+    def show_signup_window(self):
         self.clear_window()
+        
+        # Initialize SignupWindow, passing show_login_window as the callback for navigation
+        self.signup_window = SignupWindow(
+            root=self.root, 
+            login_cb=self.show_login_window # This is the callback for 'Already have an account?' button
+        )
 
-        label = tk.Label(self.root, text="Student Wallet Window", font=("Arial", 16))
-        label.pack(pady=20)
 
-        back_btn = tk.Button(self.root, text="Back", command=self.show_login_window)
-        back_btn.pack(pady=20)
+    # ==================== Login screen ===============================
 
+    def show_login_window(self):
+        self.clear_window()
+        
+        # MODIFICATION: THIS IS THE FIX. Initialize the integrated LogIn class, 
+        # passing all required callbacks for full navigation control.
+        self.login_window = LogIn(
+            root=self.root,
+            show_signup_window=self.show_signup_window, # Callback for 'Go to Sign Up' button in Login screen
+            show_student_cb=self.show_student_window,   # Callback for successful Student login
+            show_admin_cb=self.show_admin_window        # Callback for successful Admin login
+        )
 
-# ==================== MAIN ====================
-
+# Main Execution Block
 if __name__ == "__main__":
     root = tk.Tk()
     app = MainApp(root)
