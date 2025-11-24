@@ -3,11 +3,11 @@ import sqlite3
 
 class DataCenter:
     def __init__(self, db_name="Database.db"):
-        # connect to database
+        #connect to database
         self.conn = sqlite3.connect(db_name)     
         self.conn.execute("PRAGMA foreign_keys = ON")
         self.cur = self.conn.cursor()
-        # create tables if they don't exist
+        # create tables
         self._create_tables()
 
     def _create_tables(self):
@@ -21,7 +21,8 @@ class DataCenter:
         )
         """)
 
-        # Students table (with password)
+
+        #Students table (with password)
         self.cur.execute("""
         CREATE TABLE IF NOT EXISTS Students( 
             Student_ID INT(10) PRIMARY KEY NOT NULL,
@@ -34,6 +35,8 @@ class DataCenter:
             FOREIGN KEY (wallet_id) REFERENCES Wallets(Wallet_ID)
         )
         """)
+
+
 
         # KSU_Entities table
         self.cur.execute("""
@@ -59,6 +62,8 @@ class DataCenter:
         """)
 
         self.conn.commit()
+
+
 
     def close(self):
         self.conn.close()
