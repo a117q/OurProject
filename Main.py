@@ -17,7 +17,7 @@ class MainApp:
         for widget in self.root.winfo_children():
             widget.destroy()
 
-    # ==================== Login screen -EXAMPLE -   ===============================
+# ==================== Login screen -EXAMPLE -   ===============================
 
     def show_login_window(self):
         # here is the real log in screen !!!!!!!!!!
@@ -33,6 +33,7 @@ class MainApp:
         # another temp button 
         student_btn = tk.Button(self.root, text="Login as Student", command=self.show_student_window)
         student_btn.pack(pady=10)
+
 
     # ====================== admin screen   ==========================
 
