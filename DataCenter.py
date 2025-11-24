@@ -7,6 +7,7 @@ class DataCenter:
         self.conn = sqlite3.connect(db_name)     
         self.conn.execute("PRAGMA foreign_keys = ON")
         self.cur = self.conn.cursor()
+        
         # create tables
         self._create_tables()
 

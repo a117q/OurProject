@@ -10,7 +10,7 @@ class MainApp:
         self.root.title("KSU Wallet System")
         # MODIFICATION: Use a larger geometry for better display (can be adjusted)
         self.root.geometry("600x600") 
-        
+
         # MODIFICATION: The first screen should be Sign Up (based on project flow)
         self.show_signup_window()
 
