@@ -38,6 +38,15 @@ class DataCenter:
         )
         """)
 
+        has_password = False
+        for row in self.cur.execute("PRAGMA table_info(Students)"):
+            if len(row) > 1 and row[1] == "password":
+                has_password = True
+                break
+        if not has_password:
+            self.cur.execute("ALTER TABLE Students ADD COLUMN password TEXT")
+            self.conn.commit()
+
         # KSU_Entities table
         self.cur.execute("""
         CREATE TABLE IF NOT EXISTS KSU_Entities(
@@ -68,14 +77,23 @@ class DataCenter:
         while True:
             # Generate a 10-digit number
             wallet_id = random.randint(1000000000, 9999999999)
-            self.cur.execute("SELECT 1 FROM Wallets WHERE Wallet_ID = ?", (wallet_id,))
-            if not self.cur.fetchone():
+            exists = False
+            for _ in self.cur.execute("SELECT 1 FROM Wallets WHERE Wallet_ID = ?", (wallet_id,)):
+                exists = True
+                break
+            if not exists:
                 return wallet_id
         
     def check_student_id_exists(self, student_id):
         #Checks if a Student ID is already in the database.
-        self.cur.execute("SELECT 1 FROM Students WHERE Student_ID = ?", (student_id,))
-        return self.cur.fetchone() is not None
+        for _ in self.cur.execute("SELECT 1 FROM Students WHERE Student_ID = ?", (student_id,)):
+            return True
+        return False
+
+    def check_email_exists(self, email):
+        for _ in self.cur.execute("SELECT 1 FROM Students WHERE email = ?", (email,)):
+            return True
+        return False
 
     def add_student_and_wallet(self, student_id, first_name, last_name, email, phone_no, hashed_password, initial_balance):
         """Performs two inserts: Wallets and Students in one transaction."""

@@ -2,8 +2,6 @@ import tkinter as tk
 from tkinter import messagebox
 import re
 import hashlib
-import random
-from datetime import datetime
 from DataCenter import DataCenter
 
 class SignupWindow:
@@ -15,7 +13,7 @@ class SignupWindow:
         # Apply the consistent background color and title
         self.root.title("KSU Wallet - Sign Up")
         self.root.configure(bg="#B7D4FF") 
-        self.root.geometry('600x650') # Slightly increased size to fit new field
+        self.root.geometry('600x650')  # Slightly increased size to fit new field
 
         self.create_widgets()
     
@@ -25,8 +23,12 @@ class SignupWindow:
         main_frame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
         # Title Label
-        tk.Label(main_frame, text="Student Registration (Sign Up)", 
-                 font=("Arial", 16, "bold"), bg="#B7D4FF").grid(row=0, column=0, columnspan=2, pady=15)
+        tk.Label(
+            main_frame,
+            text="Student Registration (Sign Up)", 
+            font=("Arial", 16, "bold"),
+            bg="#B7D4FF"
+        ).grid(row=0, column=0, columnspan=2, pady=15)
 
         field_labels = {
             "FName": "First Name:", 
@@ -41,13 +43,24 @@ class SignupWindow:
         self.fields = {}
         row_counter = 1
         
-        # 1. Use Grid to organize labels and entry fields
+        # Labels and entry fields
         for key, label_text in field_labels.items():
-            
-            tk.Label(main_frame, text=label_text, bg="#B7D4FF").grid(row=row_counter, column=0, sticky='w', pady=5, padx=10)
+            tk.Label(main_frame, text=label_text, bg="#B7D4FF").grid(
+                row=row_counter,
+                column=0,
+                sticky='w',
+                pady=5,
+                padx=10
+            )
             
             entry = tk.Entry(main_frame, width=35)
-            entry.grid(row=row_counter, column=1, sticky='ew', pady=5, padx=10)
+            entry.grid(
+                row=row_counter,
+                column=1,
+                sticky='ew',
+                pady=5,
+                padx=10
+            )
             self.fields[key] = entry
             row_counter += 1
 
@@ -55,52 +68,67 @@ class SignupWindow:
         self.fields["PWD"].config(show="*")
         self.fields["CPWD"].config(show="*")
         
-        # 2. NEW: Show Password Checkbox
+        # Show Password Checkbox
         self.show_var = tk.IntVar()
-        tk.Checkbutton(main_frame, text="Show Password", bg="#B7D4FF",
-                       variable=self.show_var, command=self.toggle_password).grid(row=row_counter, column=1, sticky='w', padx=10)
+        tk.Checkbutton(
+            main_frame,
+            text="Show Password",
+            bg="#B7D4FF",
+            variable=self.show_var,
+            command=self.toggle_password
+        ).grid(row=row_counter, column=1, sticky='w', padx=10)
         row_counter += 1
 
-        # 3. Control Buttons (spans both columns)
-        tk.Button(main_frame, text="Submit Registration", command=self.submit_action, 
-                  font=("Arial", 12, "bold"), bg="#4CAF50", fg="white").grid(row=row_counter, column=0, columnspan=2, pady=20)
+        # Submit button
+        tk.Button(
+            main_frame,
+            text="Submit Registration",
+            command=self.submit_action, 
+            font=("Arial", 12, "bold"),
+            bg="#FFFFFF",
+            fg="black"
+        ).grid(row=row_counter, column=0, columnspan=2, pady=20)
         row_counter += 1
         
-        tk.Button(main_frame, text="Already have an account? Go to Login", command=self.login_cb, bg="#B7D4FF").grid(row=row_counter, column=0, columnspan=2, pady=10)
+        # Go to login button
+        tk.Button(
+            main_frame,
+            text="Already have an account? Go to Login",
+            command=self.login_cb,
+            bg="#B7D4FF"
+        ).grid(row=row_counter, column=0, columnspan=2, pady=10)
 
 
     def toggle_password(self):
         """Toggles the visibility of the Password and Confirm Password fields."""
         if self.show_var.get():
-            # If checked (Show)
             self.fields["PWD"].config(show="")
             self.fields["CPWD"].config(show="")
         else:
-            # If unchecked (Hide)
             self.fields["PWD"].config(show="*")
             self.fields["CPWD"].config(show="*")
 
 
     def validate_inputs(self, data):
         """Validates all inputs using RegEx and basic checks."""
-        # Check if passwords match (New Security/UX Check)
+        # Passwords match
         if data['PWD'] != data['CPWD']:
             return False, "Password and Confirm Password do not match."
 
-        # Student ID check: exactly 10 digits
-        if not re.search(r'^[0-9]{9}$', data['SID']):
-            return False, "Student ID must be exactly 9 digits."
+        # Student ID: exactly 10 digits
+        if not re.search(r'^[0-9]{10}$', data['SID']):
+            return False, "Student ID must be exactly 10 digits."
 
-        # Password check: minimum 6 characters
-        if not re.search(r'^.{6,}$', data['PWD']):
-            return False, "Password must be at least 6 characters."
+        # Password: at least 8 characters (matches DB CHECK)
+        if not re.search(r'^.{8,}$', data['PWD']):
+            return False, "Password must be at least 8 characters."
 
-        # Email check: format XXXXXX@student.ksu.edu.sa
+        # Email: XXXXXX@student.ksu.edu.sa
         email_pattern = r'^[a-zA-Z0-9._-]+@student\.ksu\.edu\.sa$'
         if not re.search(email_pattern, data['Email']):
             return False, "Email must be in the format: XXXXXX@student.ksu.edu.sa"
 
-        # Phone number check: 05XXXXXXXX (10 digits starting with 05)
+        # Phone number: 05XXXXXXXX
         phone_pattern = r'^05[0-9]{8}$'
         if not re.search(phone_pattern, data['PhoneNo']):
             return False, "Phone Number must be in the format: 05XXXXXXXX (10 digits)."
@@ -111,13 +139,12 @@ class SignupWindow:
         """Handles submission, validation, hashing, and database insertion."""
         data = {key: entry.get().strip() for key, entry in self.fields.items()}
         
-        # Check for empty fields
+        # Empty field check
         if any(not val for val in data.values()):
             messagebox.showerror("Error", "All fields are required.")
             return
 
         valid, err_msg = self.validate_inputs(data)
-        
         if not valid:
             messagebox.showerror("Validation Error", err_msg)
             return
@@ -125,19 +152,24 @@ class SignupWindow:
         std_id = int(data['SID'])
         pwd = data['PWD']
 
-        # Check for ID duplication using DataCenter helper method
+        # Check ID duplication
         if self.dc.check_student_id_exists(std_id):
             messagebox.showerror("Error", f"Student ID {std_id} is already registered.")
             return
 
-        # Security: SHA256 Hashing (Lecture #10)
+        # Check email duplication
+        if self.dc.check_email_exists(data['Email']):
+            messagebox.showerror("Error", f"Email {data['Email']} is already registered.")
+            return
+
+        # Hash password
         h_pwd = hashlib.sha256(pwd.encode('utf-8')).hexdigest()
         
-        # Initial Balance (Business Requirement)
+        # Initial balance
         init_bal = 1000.0
         
         try:
-            # Database Insertion (via DataCenter helper method)
+            # Insert into DB
             self.dc.add_student_and_wallet(
                 student_id=std_id,
                 first_name=data['FName'],
@@ -149,8 +181,7 @@ class SignupWindow:
             )
             
             messagebox.showinfo("Success", "Registration Complete!\nYou can now log in.")
-            
-            # Navigation to Login screen
+            # Go to login screen via MainApp callback
             self.login_cb()
             
         except Exception as e:
