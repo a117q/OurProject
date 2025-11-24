@@ -88,8 +88,8 @@ class SignupWindow:
             return False, "Password and Confirm Password do not match."
 
         # Student ID check: exactly 10 digits
-        if not re.search(r'^[0-9]{10}$', data['SID']):
-            return False, "Student ID must be exactly 10 digits."
+        if not re.search(r'^[0-9]{9}$', data['SID']):
+            return False, "Student ID must be exactly 9 digits."
 
         # Password check: minimum 6 characters
         if not re.search(r'^.{6,}$', data['PWD']):
