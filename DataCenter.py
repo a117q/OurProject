@@ -1,16 +1,16 @@
 # DataCenter.py
+# DataCenter.py
 import sqlite3
 import random
 from datetime import datetime
 
 class DataCenter:
     def __init__(self, db_name="Database.db"):
-        #connect to database
+        # connect to database
         self.conn = sqlite3.connect(db_name)     
         self.conn.execute("PRAGMA foreign_keys = ON")
         self.cur = self.conn.cursor()
-        
-        # create tables
+        # create tables if they don't exist
         self._create_tables()
 
     def _create_tables(self):
@@ -24,8 +24,7 @@ class DataCenter:
         )
         """)
 
-
-        #Students table (with password)
+        # Students table (with password)
         self.cur.execute("""
         CREATE TABLE IF NOT EXISTS Students( 
             Student_ID INT(10) PRIMARY KEY NOT NULL,
@@ -38,8 +37,6 @@ class DataCenter:
             FOREIGN KEY (wallet_id) REFERENCES Wallets(Wallet_ID)
         )
         """)
-
-
 
         # KSU_Entities table
         self.cur.execute("""
@@ -65,6 +62,51 @@ class DataCenter:
         """)
 
         self.conn.commit()
+
+    def generate_unique_wallet_id(self):
+        #Generates a unique 10-digit Wallet ID.
+        while True:
+            # Generate a 10-digit number
+            wallet_id = random.randint(1000000000, 9999999999)
+            self.cur.execute("SELECT 1 FROM Wallets WHERE Wallet_ID = ?", (wallet_id,))
+            if not self.cur.fetchone():
+                return wallet_id
+        
+    def check_student_id_exists(self, student_id):
+        #Checks if a Student ID is already in the database.
+        self.cur.execute("SELECT 1 FROM Students WHERE Student_ID = ?", (student_id,))
+        return self.cur.fetchone() is not None
+
+    def add_student_and_wallet(self, student_id, first_name, last_name, email, phone_no, hashed_password, initial_balance):
+        """Performs two inserts: Wallets and Students in one transaction."""
+        try:
+            wallet_id = self.generate_unique_wallet_id()
+            create_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        # 1. Insert into Wallets table
+            self.cur.execute(
+            """
+            INSERT INTO Wallets (Wallet_ID, Owner_type, Balance, Create_time)
+            VALUES (?, ?, ?, ?)
+            """,
+                (wallet_id, "student", initial_balance, create_time)
+            )
+
+        # 2. Insert into Students table (using the HASHED password)
+            self.cur.execute(
+            """
+            INSERT INTO Students (Student_ID, FirstName, LastName, email, PhoneNo, wallet_id, password)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            """,
+                (student_id, first_name, last_name, email, phone_no, wallet_id, hashed_password)
+            )
+        
+            self.conn.commit()
+            return True
+
+        except Exception as e:
+            self.conn.rollback()
+            raise e
 
     def close(self):
         self.conn.close()
