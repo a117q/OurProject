@@ -27,7 +27,7 @@ class DataCenter:
         # Students table (with password)
         self.cur.execute("""
         CREATE TABLE IF NOT EXISTS Students( 
-            Student_ID INT(10) PRIMARY KEY NOT NULL,
+            Student_ID INT(9) PRIMARY KEY NOT NULL,
             FirstName  TEXT NOT NULL,
             LastName   TEXT NOT NULL,
             email      TEXT NOT NULL,
