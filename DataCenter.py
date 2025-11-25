@@ -3,6 +3,7 @@
 import sqlite3
 import random
 from datetime import datetime
+import hashlib
 
 class DataCenter:
     def __init__(self, db_name="Database.db"):
@@ -24,6 +25,14 @@ class DataCenter:
         )
         """)
 
+        # Admin table 
+        self.cur.execute("""
+        CREATE TABLE IF NOT EXISTS Managers(
+            Manager_ID TEXT PRIMARY KEY NOT NULL,
+            Password TEXT NOT NULL, 
+            FirstName TEXT
+        )
+        """)
         # Students table (with password)
         self.cur.execute("""
         CREATE TABLE IF NOT EXISTS Students( 
@@ -94,6 +103,40 @@ class DataCenter:
         for _ in self.cur.execute("SELECT 1 FROM Students WHERE email = ?", (email,)):
             return True
         return False
+    
+    #----------------------------------------------------------------------
+
+    def add_initial_manager(self, manager_id, raw_password, first_name="Admin"):
+        """Adds the initial Admin account to the DB if it does not exist."""
+        # 1. تشفير كلمة المرور النصية باستخدام SHA256
+        hashed_password = hashlib.sha256(raw_password.encode('utf-8')).hexdigest()
+    
+        # 2. التحقق من عدم وجود المشرف مسبقًا
+        self.cur.execute("SELECT 1 FROM Managers WHERE Manager_ID = ?", (manager_id,))
+        if self.cur.fetchone():
+            return  # المشرف موجود، لا نفعل شيئًا
+        
+    # 3. إدخال المشرف الجديد
+        try:
+            self.cur.execute(
+                "INSERT INTO Managers (Manager_ID, Password, FirstName) VALUES (?, ?, ?)",
+                (manager_id, hashed_password, first_name)
+            )
+            self.conn.commit()
+        except Exception as e:
+            print(f"Error adding initial manager: {e}") 
+
+    def check_manager_login(self, manager_id, hashed_password):
+         """Checks the Manager's credentials against the DB."""
+
+         self.cur.execute(
+            "SELECT 1 FROM Managers WHERE Manager_ID = ? AND Password = ?",
+            (manager_id, hashed_password)
+        )
+        # ترجع True إذا وجد تطابق، و False إذا لم يجد
+         return self.cur.fetchone() is not None
+    #-------------------------------------------------------------------------
+
 
     def add_student_and_wallet(self, student_id, first_name, last_name, email, phone_no, hashed_password, initial_balance):
         """Performs two inserts: Wallets and Students in one transaction."""
