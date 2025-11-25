@@ -20,7 +20,7 @@ class StudentWalletWindow:
         # Window setup
         self.root.title("KSU Wallet - Student Wallet")
         self.root.configure(bg="#B7D4FF")
-        self.root.geometry('600x450') 
+        self.root.geometry('550x550') 
         
         self.create_widgets()
         

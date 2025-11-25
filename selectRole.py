@@ -8,7 +8,7 @@ class selectRole:
         
         self.root.title("KSU Wallet - Select Role")
         self.root.configure(bg="#B7D4FF") 
-        self.root.geometry('500x350') 
+        self.root.geometry('550x550') 
         self.create_widgets()
 
     def create_widgets(self):

@@ -19,7 +19,7 @@ class LogIn:
         
         self.root.title("KSU Wallet - Log In")
         self.root.configure(bg="#B7D4FF")
-        self.root.geometry('600x400')
+        self.root.geometry('550x550')
         
         self.create_widgets()
 

@@ -13,7 +13,7 @@ class SignupWindow:
         # Apply the consistent background color and title
         self.root.title("KSU Wallet - Sign Up")
         self.root.configure(bg="#B7D4FF") 
-        self.root.geometry('600x650')  # Slightly increased size to fit new field
+        self.root.geometry('550x550')  # Slightly increased size to fit new field
 
         self.create_widgets()
     

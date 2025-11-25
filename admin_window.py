@@ -12,7 +12,7 @@ class AdminsWindow:
         self.go_back_callback = go_back_callback
 
         self.root.title("Admin Window")
-        self.root.geometry("600x400")
+        self.root.geometry("550x550")
 
         self.notebook = ttk.Notebook(self.root)
         self.view_tab = ttk.Frame(self.notebook)

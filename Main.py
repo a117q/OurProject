@@ -11,7 +11,7 @@ class MainApp:
     def __init__(self, root):
         self.root = root
         self.root.title("KSU Wallet System")
-        self.root.geometry("600x600") 
+        self.root.geometry("550x550") 
 
         self.dc = DataCenter()
         self.dc.add_initial_manager("0123456789", "ad223344", "Admin")
