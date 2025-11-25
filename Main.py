@@ -5,7 +5,6 @@ from LogIn import LogIn
 from SignupWindow import SignupWindow 
 from StudentWalletWindow import StudentWalletWindow
 from selectRole import selectRole
-import hashlib 
 
 class MainApp:
     def __init__(self, root):

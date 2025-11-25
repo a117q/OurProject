@@ -3,8 +3,6 @@ from tkinter import messagebox
 import sqlite3
 import hashlib 
 from DataCenter import DataCenter
-from admin_window import AdminsWindow
-from StudentWalletWindow import StudentWalletWindow 
 
 class LogIn:
     def __init__(self, root, show_signup_window, show_student_cb, show_admin_cb, is_admin_mode= False ):
