@@ -3,7 +3,7 @@ import tkinter as tk
 from admin_window import AdminsWindow 
 from LogIn import LogIn
 from SignupWindow import SignupWindow # Assuming SignupWindow is available
-
+from StudentWalletWindow import StudentWalletWindow
 class MainApp:
     def __init__(self, root):
         self.root = root
@@ -22,12 +22,28 @@ class MainApp:
     # ==================== Student and Admin Callbacks ===============================
     
     # MODIFICATION: Student window must be able to accept student_id from LogIn.py
+# ==================== Student and Admin Callbacks ===============================
+    
     def show_student_window(self, student_id):
+        """Displays the Student Wallet Window after successful login."""
         self.clear_window()
+        # Initializes the actual StudentWalletWindow
+        self.student_wallet_window = StudentWalletWindow(
+            root=self.root,
+            student_id=student_id,
+            go_back_callback=self.show_login_window # Passes the callback to return to login
+        )
+
+    # ... (Keep show_admin_window and other methods as they are)
+
+
+    ##def show_student_window(self, student_id):
+        #self.clear_window()
         # This is a temporary window. Replace with actual StudentWalletWindow initialization later.
-        label = tk.Label(self.root, text=f"Student Wallet Window - ID: {student_id}", font=("Arial", 16))
-        label.pack(pady=50)
-        tk.Button(self.root, text="Go Back to Login", command=self.show_login_window).pack(pady=10)
+        
+        #label = tk.Label(self.root, text=f"Student Wallet Window - ID: {student_id}", font=("Arial", 16))
+        #label.pack(pady=50)
+        #tk.Button(self.root, text="Go Back to Login", command=self.show_login_window).pack(pady=10)
 
     def show_admin_window(self):
         self.clear_window()
