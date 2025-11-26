@@ -119,8 +119,8 @@ class SignupWindow:
         if not re.search(r'^[0-9]{10}$', data['SID']):
             return False, "Student ID must be exactly 10 digits."
 
-        # Password: at least 8 characters (matches DB CHECK)
-        if not re.search(r'^.{8,}$', data['PWD']):
+        # Password: at least 6 characters (matches DB CHECK)
+        if not re.search(r'^.{6,}$', data['PWD']):
             return False, "Password must be at least 8 characters."
 
         # Email: XXXXXX@student.ksu.edu.sa
