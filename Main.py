@@ -12,16 +12,20 @@ class MainApp:
         self.root.geometry("550x550") 
 
         self.dc = DataCenter()
-        #add_manager
+        #adding manager
         self.dc.add_initial_manager()
         self.show_login_window() 
         
+    #cleaning the screen before opening a new window (prevent  overlapping)
     def clear_window(self):
         for widget in self.root.winfo_children():
             widget.destroy()
-    
+
+
+    #-----------------------------Student screen---------------------------
     def show_student_window(self, student_id):
-        """Displays the Student Wallet Window after successful login."""
+
+        #displayin student wallet window after log in 
         self.clear_window()
         self.student_wallet_window = StudentWalletWindow(
             root=self.root,
@@ -29,15 +33,18 @@ class MainApp:
             go_back_callback=self.show_login_window 
         )
 
+    #--------------------Admin screen-----------------------------
     def show_admin_window(self):
-        """Displays the Admin (Manager) Window after successful login."""
+        #displaying the admin(manager) window after log in
         self.clear_window()
+
         self.admin_window = AdminsWindow(
             self.root,
-            go_back_callback=self.show_login_window  # العودة لشاشة الدخول
+            go_back_callback=self.show_login_window  #back to log in window
         )
 
-    # ==================== Sign Up screen ===============================
+
+    #-----------------------------Sign Up screen-----------------------------
 
     def show_signup_window(self):
         self.clear_window()
@@ -47,7 +54,8 @@ class MainApp:
             login_cb=self.show_login_window 
         )
 
-    # ==================== Login screen ===============================
+
+    #-----------------------------Login screen-----------------------------
 
     def show_login_window(self):
         self.clear_window()
@@ -58,6 +66,7 @@ class MainApp:
             show_student_cb=self.show_student_window,  
             show_admin_cb=self.show_admin_window       
         )
+
 
 if __name__ == "__main__":
     root = tk.Tk()
