@@ -6,7 +6,7 @@ from datetime import datetime
 
 class StudentWalletWindow:
 
-    def init(self, root, student_id, go_back_callback):
+    def __init__(self, root, student_id, go_back_callback):
         self.root = root
         self.student_id = student_id
         self.go_back_callback = go_back_callback
