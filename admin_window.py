@@ -194,6 +194,7 @@ class AdminsWindow:
         except Exception as e:
             messagebox.showerror("Error", f"An error occurred while adding the entity:\n{e}")
 
+
     ##------------------Manage Tab#------------------
 
     def create_manage_tab(self):
@@ -214,7 +215,6 @@ class AdminsWindow:
         back_btn.pack(pady=20)
 
     def pay_stipends(self):
-    
         #adding 1000 SR to all student wallets
         try:
             with self.dc.SessionLocal() as session:
@@ -234,20 +234,29 @@ class AdminsWindow:
              )
             
     def clear_balances(self):
-        #sell all the wallet balances to 0
+    #male all entity wallet balances to 0 (Cash Out)
         try:
             with self.dc.SessionLocal() as session:
-                session.query(Wallet).update( {Wallet.Balance: 0}, synchronize_session=False)
+                session.query(Wallet).filter(
+                    Wallet.Owner_type == "ksu"
+                ).update(
+                {Wallet.Balance: 0},
+                synchronize_session=False
+                 )
                 session.commit()
 
+            #update the window
             self.load_entities()
+
             messagebox.showinfo(
-                "Success", "All wallets have been cashed out (balance = 0)."
-            )
+                "Success",
+                "All KSU entity wallets have been cashed out (balance = 0)."
+             )
         except Exception as e:
             messagebox.showerror(
                 "Error", f"An error occurred while clearing balances:\n{e}"
-            )
+             )
+
 
     def go_back(self):
         #back botton , go to login/signup window
