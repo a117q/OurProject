@@ -12,7 +12,7 @@ class MainApp:
         self.root.geometry("550x550") 
 
         self.dc = DataCenter()
-        #add_initial_manager
+        #add_manager
         self.dc.add_initial_manager()
         self.show_login_window() 
         
