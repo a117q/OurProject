@@ -11,7 +11,7 @@ class AdminsWindow:
         self.root.title("Admin Window")
         self.root.geometry("550x550")
 
-        # SQLAlchemy DataCenter
+        #SQLAlchemy DataCenter
         self.dc = DataCenter()
 
         self.notebook = ttk.Notebook(self.root)
@@ -24,17 +24,17 @@ class AdminsWindow:
         self.notebook.add(self.manage_tab, text="Manage")
         self.notebook.pack(pady=10, expand=True, fill="both")
 
-        # to keep raw data for each row in listbox (for View Balance)
+        #to keep data for each row in listbox (for View Balance)
         self.entities_data = []
 
         self.create_view_tab()
         self.create_add_tab()
         self.create_manage_tab()
 
-        # Load all entities (students + KSU entities)
+        #loading all entities (students and KSU entities)
         self.load_entities()
 
-    # ================== View Tab ==================
+    #------------------View Tab#------------------
 
     def create_view_tab(self):
         title = tk.Label(self.view_tab, text="View KSU Entities & Students", font=("Arial", 14))
@@ -43,32 +43,22 @@ class AdminsWindow:
         list_frame = tk.Frame(self.view_tab, bg="#333333")
         list_frame.pack(pady=5, fill="both", expand=True)
 
-        self.entities_listbox = tk.Listbox(
-            list_frame,
-            height=10,
-            bg="#111111",
-            fg="white"
-        )
+        self.entities_listbox = tk.Listbox(list_frame , height=10 , bg="#111111" , fg="white")
+
         self.entities_listbox.pack(side="left", fill="both", expand=True, padx=(10, 0), pady=5)
 
         scrollbar = tk.Scrollbar(list_frame, orient="vertical", command=self.entities_listbox.yview)
-        scrollbar.pack(side="right", fill="y", padx=(0, 10), pady=5)
+        scrollbar.pack(side="right" , fill="y",  padx=(0, 10) ,  pady=5)
         self.entities_listbox.config(yscrollcommand=scrollbar.set)
 
-        view_balance_btn = tk.Button(
-            self.view_tab,
-            text="View Balance",
-            command=self.view_selected_balance
-        )
+        view_balance_btn = tk.Button(self.view_tab , text="View Balance", command=self.view_selected_balance )
         view_balance_btn.pack(pady=10)
 
     def load_entities(self):
-        """
-        Loads ALL entities into the listbox in this format:
+        
+        #loading all the entites into the listbox like this format:
+        #Id : .... | Name: .... | Type: Student/KSU Entity | Wallet: .... | Balance: .... SR
 
-        ID: 2020123456 | Name: Sara Ali | Type: Student | Wallet: 1234567890 | Balance: 1000.00 SR
-        ID: 5550001111 | Name: Bookstore | Type: KSU Entity | Wallet: 5550001111 | Balance: 0.00 SR
-        """
         self.entities_listbox.delete(0, tk.END)
         self.entities_data = []
 
@@ -108,18 +98,15 @@ class AdminsWindow:
 
                     self.entities_data.append(
                         {
-                            "entity_id": entity_id,
-                            "name": name,
-                            "type": type_str,
-                            "wallet_id": wallet_id,
-                            "balance": balance,
+                            "entity_id": entity_id,"name": name,"type": type_str,
+                            "wallet_id": wallet_id,"balance": balance,
                         }
                     )
-
                     self.entities_listbox.insert(tk.END, display)
 
         except Exception as e:
             messagebox.showerror("Database Error", f"Could not load entities:\n{e}")
+
 
     def view_selected_balance(self):
         selection = self.entities_listbox.curselection()
@@ -129,7 +116,7 @@ class AdminsWindow:
 
         index = selection[0]
         if index < 0 or index >= len(self.entities_data):
-            messagebox.showerror("Error", "Invalid selection.")
+            messagebox.showerror*("Error . Invalid selection.")
             return
 
         data = self.entities_data[index]
@@ -142,10 +129,10 @@ class AdminsWindow:
             f"Entity: {name}\nType: {type_str}\nCurrent Balance: {balance} SR"
         )
 
-    # ================== Add Tab ==================
+    ##------------------Add Tab------------------
 
     def create_add_tab(self):
-        title = tk.Label(self.add_tab, text="Add KSU Entity", font=("Arial", 14))
+        title = tk.Label(self.add_tab , text="Add KSU Entity" , font=("Arial", 14))
         title.pack(pady=10)
 
         name_label = tk.Label(self.add_tab, text="Entity Name:")
@@ -154,13 +141,11 @@ class AdminsWindow:
         self.add_name_entry = tk.Entry(self.add_tab, width=30)
         self.add_name_entry.pack(pady=5)
 
-        submit_btn = tk.Button(self.add_tab, text="Submit", command=self.add_entity)
+        submit_btn = tk.Button(self.add_tab , text="Submit" , command=self.add_entity)
         submit_btn.pack(pady=10)
 
     def add_entity(self):
-        """
-        Add a new KSU entity with its own wallet using SQLAlchemy.
-        """
+        #Adding new KSU entity with its own wallet 
         entity_name = self.add_name_entry.get().strip()
 
         if not entity_name:
@@ -169,11 +154,9 @@ class AdminsWindow:
 
         try:
             with self.dc.SessionLocal() as session:
-                # check duplicate
+                #check duplicate
                 exists = (
-                    session.query(KSUEntity)
-                    .filter(KSUEntity.Name == entity_name)
-                    .first()
+                    session.query(KSUEntity).filter(KSUEntity.Name == entity_name).first()
                 )
                 if exists:
                     messagebox.showerror(
@@ -181,25 +164,19 @@ class AdminsWindow:
                     )
                     return
 
-                # new unique wallet id (10 digits) from DataCenter helper
+                #new unique wallet id with 10 digits from the datacenter helper
                 wallet_id = self.dc.generate_unique_wallet_id()
                 create_time = datetime.now()
 
-                # insert wallet
+                #insert wallet
                 wallet = Wallet(
-                    Wallet_ID=wallet_id,
-                    Owner_type="ksu",
-                    Balance=0.0,
-                    Create_time=create_time,
+                    Wallet_ID=wallet_id,Owner_type="ksu",
+                    Balance=0.0,Create_time=create_time,
                 )
                 session.add(wallet)
 
-                # insert entity
-                entity = KSUEntity(
-                    Entity_ID=wallet_id,
-                    Name=entity_name,
-                    wallet_id=wallet_id,
-                )
+                #insert entity
+                entity = KSUEntity( Entity_ID=wallet_id, Name=entity_name, wallet_id=wallet_id)
                 session.add(entity)
 
                 session.commit()
@@ -217,17 +194,13 @@ class AdminsWindow:
         except Exception as e:
             messagebox.showerror("Error", f"An error occurred while adding the entity:\n{e}")
 
-    # ========================= Manage Tab =====================
+    ##------------------Manage Tab#------------------
 
     def create_manage_tab(self):
         title = tk.Label(self.manage_tab, text="Manage", font=("Arial", 14))
         title.pack(pady=10)
 
-        pay_btn = tk.Button(
-            self.manage_tab,
-            text="Pay Stipends",
-            command=self.pay_stipends,
-        )
+        pay_btn = tk.Button(self.manage_tab,text="Pay Stipends",command=self.pay_stipends)
         pay_btn.pack(pady=10)
 
         cashout_btn = tk.Button(
@@ -237,17 +210,12 @@ class AdminsWindow:
         )
         cashout_btn.pack(pady=10)
 
-        back_btn = tk.Button(
-            self.manage_tab,
-            text="Back",
-            command=self.go_back,
-        )
+        back_btn = tk.Button( self.manage_tab,text="Back",command=self.go_back)
         back_btn.pack(pady=20)
 
     def pay_stipends(self):
-        """
-        Add 1000 SR to all student wallets, then refresh the View tab.
-        """
+    
+        #adding 1000 SR to all student wallets
         try:
             with self.dc.SessionLocal() as session:
                 session.query(Wallet).filter(
@@ -263,17 +231,13 @@ class AdminsWindow:
         except Exception as e:
             messagebox.showerror(
                 "Error", f"An error occurred while paying stipends:\n{e}"
-            )
-
+             )
+            
     def clear_balances(self):
-        """
-        Set ALL wallet balances (students + KSU entities) to 0, then refresh View.
-        """
+        #sell all the wallet balances to 0
         try:
             with self.dc.SessionLocal() as session:
-                session.query(Wallet).update(
-                    {Wallet.Balance: 0}, synchronize_session=False
-                )
+                session.query(Wallet).update( {Wallet.Balance: 0}, synchronize_session=False)
                 session.commit()
 
             self.load_entities()
@@ -286,7 +250,7 @@ class AdminsWindow:
             )
 
     def go_back(self):
-        """Back button: go back to Sign Up/Login window (via callback from MainApp)."""
+        #back botton , go to login/signup window
         if self.go_back_callback:
             self.go_back_callback()
         else:
