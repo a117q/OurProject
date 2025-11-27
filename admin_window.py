@@ -4,7 +4,7 @@ from datetime import datetime
 from DataCenter import DataCenter , Wallet , KSUEntity
 
 class AdminsWindow:
-    def init(self, root, go_back_callback=None):
+    def __init__(self, root, go_back_callback=None):
         self.root = root
         self.go_back_callback = go_back_callback
 
