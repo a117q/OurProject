@@ -74,8 +74,78 @@ class LogIn:
         else:
             self.password_entry.config(show="*")
 
-    
+    def check_login(self):
+        id_text = self.id_entry.get().strip()
+        password = self.password_entry.get()
 
+        # 1. التحقق الأساسي من وجود المدخلات
+        if not id_text or not password:
+            messagebox.showwarning("Error", "Please enter both ID and password.")
+            return
+
+        # التحقق من أن الهوية تتكون من 10 أرقام
+        if not (id_text.isdigit() and len(id_text) == 10):
+            messagebox.showerror("Error", "ID must contain exactly 10 digits.")
+            return
+
+        # تحويل الهوية إلى رقم صحيح (لاستخدامه في التحقق)
+        student_id = int(id_text) 
+        
+        # ==========================================================
+        # 2. التحقق من المسؤول (ADMIN CHECK) - باستخدام البيانات الثابتة
+        # ==========================================================
+        
+        # ID المسؤول (0123456789 يُقرأ في بايثون كـ 1234567890 كرقم صحيح)
+        ADMIN_ID_INT = 1234567890 
+        ADMIN_PASS = "ad223344"
+        
+        if student_id == ADMIN_ID_INT and password == ADMIN_PASS:
+            messagebox.showinfo("Success", "Login successful (Admin).")
+            self.show_admin_cb() # الانتقال لواجهة المشرف
+            return # إنهاء الدالة بعد دخول المسؤول بنجاح
+        
+        # ==========================================================
+        # 3. تشفير كلمة المرور للتحقق من الطالب (STUDENT CHECK)
+        # ==========================================================
+        try:
+            h_pwd = hashlib.sha256(password.encode('utf-8')).hexdigest()
+        except Exception as e:
+            messagebox.showerror("Error", f"An error occurred during password hashing: {e}")
+            return
+            
+        try:
+            cur = self.dc.cur
+        
+            # التحقق من الطالب في جدول Students
+            cur.execute(
+            "SELECT wallet_id FROM Students WHERE Student_ID = ? AND password = ?",
+            (student_id, h_pwd)
+            )
+            student_wallet_id = cur.fetchone()
+
+            if student_wallet_id:
+                messagebox.showinfo("Success", "Login successful (Student).")
+                self.show_student_cb(student_id)
+            else:
+                # 4. معالجة فشل تسجيل الدخول
+            
+                # التحقق مما إذا كانت الهوية موجودة كطالب (لإعطاء رسالة خطأ أدق)
+                cur.execute(
+                    "SELECT 1 FROM Students WHERE Student_ID = ?",
+                    (student_id,)
+                )
+                if cur.fetchone():
+                    messagebox.showerror("Error", "Incorrect password.")
+                else:
+                    messagebox.showerror("Error", "There is no account with this ID.")
+    
+        except sqlite3.Error as e:
+             messagebox.showerror("Database Error", f"Database error:\n{e}")
+            
+    
+    def action(self):
+        self.check_login()
+"""""ة
     def check_login(self):
         id_text = self.id_entry.get().strip()
         password = self.password_entry.get()
@@ -132,3 +202,4 @@ class LogIn:
     
     def action(self):
         self.check_login()
+"""""
