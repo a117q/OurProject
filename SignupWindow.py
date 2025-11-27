@@ -10,15 +10,15 @@ class SignupWindow:
         self.dc = DataCenter()
         self.login_cb = login_cb
 
-        # Apply the consistent background color and title
+        # Window setup
         self.root.title("KSU Wallet - Sign Up")
         self.root.configure(bg="#B7D4FF") 
-        self.root.geometry('550x550')  # Slightly increased size to fit new field
+        self.root.geometry('550x550')
 
         self.create_widgets()
     
     def create_widgets(self):
-        # Main Frame centered, using Grid geometry manager
+        # Main Frame centered
         main_frame = tk.Frame(self.root, padx=30, pady=30, bg="#B7D4FF") 
         main_frame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
@@ -98,6 +98,7 @@ class SignupWindow:
             bg="#B7D4FF"
         ).grid(row=row_counter, column=0, columnspan=2, pady=10)
 
+    # ---------------------------------------------------
 
     def toggle_password(self):
         """Toggles the visibility of the Password and Confirm Password fields."""
@@ -107,10 +108,9 @@ class SignupWindow:
         else:
             self.fields["PWD"].config(show="*")
             self.fields["CPWD"].config(show="*")
-
-
     def validate_inputs(self, data):
         """Validates all inputs using RegEx and basic checks."""
+
         # Passwords match
         if data['PWD'] != data['CPWD']:
             return False, "Password and Confirm Password do not match."
@@ -119,8 +119,8 @@ class SignupWindow:
         if not re.search(r'^[0-9]{10}$', data['SID']):
             return False, "Student ID must be exactly 10 digits."
 
-        # Password: at least 6 characters (matches DB CHECK)
-        if not re.search(r'^.{6,}$', data['PWD']):
+        # Password: at least 8 characters (matches DB CHECK)
+        if not re.search(r'^.{8,}$', data['PWD']):
             return False, "Password must be at least 8 characters."
 
         # Email: XXXXXX@student.ksu.edu.sa
@@ -134,6 +134,8 @@ class SignupWindow:
             return False, "Phone Number must be in the format: 05XXXXXXXX (10 digits)."
             
         return True, "Success"
+
+    # ---------------------------------------------------
 
     def submit_action(self):
         """Handles submission, validation, hashing, and database insertion."""
@@ -149,10 +151,20 @@ class SignupWindow:
             messagebox.showerror("Validation Error", err_msg)
             return
 
+        # 🔹 1) Check that this ID is NOT a manager ID
+        manager_id_str = data['SID']   # Managers.Manager_ID is TEXT
+        if self.dc.check_manager_id_exists(manager_id_str):
+            messagebox.showerror(
+                "Error",
+                "Student cannot use this ID, pleas try deferent ID."
+            )
+            return
+
+        # 🔹 2) Now treat it as a normal student ID
         std_id = int(data['SID'])
         pwd = data['PWD']
 
-        # Check ID duplication
+        # Check student ID duplication
         if self.dc.check_student_id_exists(std_id):
             messagebox.showerror("Error", f"Student ID {std_id} is already registered.")
             return

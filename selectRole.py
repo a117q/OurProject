@@ -16,12 +16,12 @@ class selectRole:
         main_frame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
         
         tk.Label(main_frame, text="Welcome to KSU Wallet System!  \n  Please select your role:", 
-                 font=("Arial", 14, "bold"), bg="#B7D4FF", fg="#333333").pack(pady=20)
+                font=("Arial", 14, "bold"), bg="#B7D4FF", fg="#333333").pack(pady=20)
         
         tk.Button(main_frame, text="Student", width=20, height=2, 
-                  command=self.main_app.show_signup_window, 
-                  font=("Arial", 12), bg="#F0F0F0").pack(pady=15)
+                command=self.main_app.show_signup_window, 
+                ont=("Arial", 12), bg="#F0F0F0").pack(pady=15)
         
         tk.Button(main_frame, text="Admin", width=20, height=2, 
-                  command=self.main_app.show_login_admin_mode, 
-                  font=("Arial", 12), bg="#F0F0F0").pack(pady=15)
+                command=self.main_app.show_login_admin_mode, 
+                font=("Arial", 12), bg="#F0F0F0").pack(pady=15)
