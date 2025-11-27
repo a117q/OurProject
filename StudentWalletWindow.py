@@ -1,3 +1,4 @@
+import site
 import tkinter as tk
 from tkinter import messagebox
 from DataCenter import DataCenter
@@ -158,7 +159,7 @@ class StudentWalletWindow:
             target_wallet_data = cur.fetchone()
             
             if target_wallet_data is None:
-                messagebox.showerror("Error", "The entered Wallet Number does not exist.") [cite: 52]
+                messagebox.showerror("Error", "The entered Wallet Number does not exist.") [site: 52]
                 return
             
             target_balance = target_wallet_data[0]
