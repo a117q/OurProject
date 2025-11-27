@@ -97,7 +97,7 @@ class LogIn:
         
         # ID المسؤول (0123456789 يُقرأ في بايثون كـ 1234567890 كرقم صحيح)
         ADMIN_ID_INT = 1234567890 
-        ADMIN_PASS = "ad223344"
+        ADMIN_PASS = "12345678"
         
         if student_id == ADMIN_ID_INT and password == ADMIN_PASS:
             messagebox.showinfo("Success", "Login successful (Admin).")
