@@ -13,7 +13,7 @@ class MainApp:
         self.root.geometry("550x550") 
 
         self.dc = DataCenter()
-        self.dc.add_initial_manager("0123456789", "ad223344", "Admin")
+        self.dc.add_initial_manager("1234567890", "ad223344", "Admin")
         
         # نقطة البداية الجديدة: شاشة الدخول
         self.show_login_window() 
