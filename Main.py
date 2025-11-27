@@ -14,7 +14,7 @@ class MainApp:
         self.dc = DataCenter()
         #adding manager
         self.dc.add_initial_manager()
-        self.show_login_window() 
+        self.show_signup_window() 
         
     #cleaning the screen before opening a new window (prevent  overlapping)
     def clear_window(self):
@@ -66,7 +66,6 @@ class MainApp:
             show_student_cb=self.show_student_window,  
             show_admin_cb=self.show_admin_window       
         )
-
 
 if __name__ == "__main__":
     root = tk.Tk()
