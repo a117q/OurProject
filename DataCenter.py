@@ -1,93 +1,127 @@
 import random
 import hashlib
 from datetime import datetime
-import hashlib
+
+from sqlalchemy import (
+    create_engine,
+    Column,
+    Integer,
+    String,
+    Float,
+    DateTime,
+    ForeignKey,
+    CheckConstraint,
+    Text,
+    select,
+    exists,
+)
+from sqlalchemy.orm import declarative_base, relationship, sessionmaker
+
+# -------------------------
+# SQLAlchemy Base & Models
+# -------------------------
+
+Base = declarative_base()
+
+
+class Wallet(Base):
+    __tablename__ = "Wallets"
+
+    Wallet_ID = Column(Integer, primary_key=True)  # 10-digit int
+    Owner_type = Column(String, nullable=False)    # 'student' or 'ksu'
+    Balance = Column(Float, default=0)
+    Create_time = Column(DateTime)
+
+    student = relationship("Student", back_populates="wallet", uselist=False)
+    entity = relationship("KSUEntity", back_populates="wallet", uselist=False)
+
+    from_transactions = relationship(
+        "Transaction",
+        foreign_keys="Transaction.from_wallet_id",
+        back_populates="from_wallet",
+    )
+    to_transactions = relationship(
+        "Transaction",
+        foreign_keys="Transaction.to_wallet_id",
+        back_populates="to_wallet",
+    )
+
+
+class Manager(Base):
+    __tablename__ = "Managers"
+
+    Manager_ID = Column(String, primary_key=True)
+    Password = Column(Text, nullable=False)
+    FirstName = Column(String, nullable=False)
+    LastName = Column(String, nullable=False)
+
+
+class Student(Base):
+    __tablename__ = "Students"
+
+    Student_ID = Column(Integer, primary_key=True)  # 10-digit int
+    FirstName = Column(String, nullable=False)
+    LastName = Column(String, nullable=False)
+    email = Column(String, nullable=False)
+    PhoneNo = Column(Integer)
+    wallet_id = Column(Integer, ForeignKey("Wallets.Wallet_ID"))
+    password = Column(String, nullable=False)
+
+    __table_args__ = (
+        CheckConstraint("length(password) >= 8", name="ck_students_password_len"),
+    )
+
+    wallet = relationship("Wallet", back_populates="student")
+
+
+class KSUEntity(Base):
+    __tablename__ = "KSU_Entities"
+
+    Entity_ID = Column(Integer, primary_key=True)  # 10-digit int
+    Name = Column(String, nullable=False)
+    wallet_id = Column(Integer, ForeignKey("Wallets.Wallet_ID"))
+
+    wallet = relationship("Wallet", back_populates="entity")
+
+
+class Transaction(Base):
+    __tablename__ = "Transactions"
+
+    Transaction_ID = Column(Integer, primary_key=True)
+    from_wallet_id = Column(Integer, ForeignKey("Wallets.Wallet_ID"))
+    to_wallet_id = Column(Integer, ForeignKey("Wallets.Wallet_ID"), nullable=False)
+    Type = Column(String)
+    Time = Column(DateTime)
+
+    from_wallet = relationship(
+        "Wallet",
+        foreign_keys=[from_wallet_id],
+        back_populates="from_transactions",
+    )
+    to_wallet = relationship(
+        "Wallet",
+        foreign_keys=[to_wallet_id],
+        back_populates="to_transactions",
+    )
+
+
+# -------------------------
+# DataCenter using ORM
+# -------------------------
 
 class DataCenter:
-    def __init__(self, db_name="Database.db"):
-        # connect to database
-        self.conn = sqlite3.connect(db_name)
-        self.conn.execute("PRAGMA foreign_keys = ON")
-        self.cur = self.conn.cursor()
-        # create tables if they don't exist
-        self._create_tables()
+    def __init__(self, db_url="sqlite:///Database.db"):
+        """
+        Connect to database and create tables if they don't exist.
+        Example db_url: 'sqlite:///Database.db'
+        """
+        self.engine = create_engine(db_url, echo=False, future=True)
+        Base.metadata.create_all(self.engine)
+        self.SessionLocal = sessionmaker(bind=self.engine, expire_on_commit=False)
 
-    # -------------------------------------------------
-    # Tables
-    # -------------------------------------------------
-    def _create_tables(self):
-        # Wallet table
-        self.cur.execute("""
-        CREATE TABLE IF NOT EXISTS Wallets(
-            Wallet_ID   INT(10) PRIMARY KEY NOT NULL,
-            Owner_type  TEXT NOT NULL,   -- 'student' or 'ksu'
-            Balance     FLOAT,
-            Create_time DATETIME
-        )
-        """)
-
-        # Managers table
-        self.cur.execute("""
-        CREATE TABLE IF NOT EXISTS Managers(
-            Manager_ID TEXT PRIMARY KEY NOT NULL,
-            Password   TEXT NOT NULL,
-            FirstName  TEXT NOT NULL,
-            LastName   TEXT NOT NULL
-        )
-        """)
-
-        # Students table
-        self.cur.execute("""
-        CREATE TABLE IF NOT EXISTS Students(
-            Student_ID INT(10) PRIMARY KEY NOT NULL,
-            FirstName  TEXT NOT NULL,
-            LastName   TEXT NOT NULL,
-            email      TEXT NOT NULL,
-            PhoneNo    INT,
-            wallet_id  INT(10),
-            password   TEXT NOT NULL CHECK (LENGTH(password) >= 8),
-            FOREIGN KEY (wallet_id) REFERENCES Wallets(Wallet_ID)
-        )
-        """)
-
-        # Ensure password column exists (for old DBs)
-        has_password = False
-        for row in self.cur.execute("PRAGMA table_info(Students)"):
-            if len(row) > 1 and row[1] == "password":
-                has_password = True
-                break
-        if not has_password:
-            self.cur.execute("ALTER TABLE Students ADD COLUMN password TEXT")
-            self.conn.commit()
-
-        # KSU_Entities table
-        self.cur.execute("""
-        CREATE TABLE IF NOT EXISTS KSU_Entities(
-            Entity_ID INT(10) PRIMARY KEY NOT NULL,
-            Name      TEXT NOT NULL,
-            wallet_id INT(10),
-            FOREIGN KEY (wallet_id) REFERENCES Wallets(Wallet_ID)
-        )
-        """)
-
-        # Transactions table
-        self.cur.execute("""
-        CREATE TABLE IF NOT EXISTS Transactions(
-            Transaction_ID  INT PRIMARY KEY NOT NULL,
-            from_wallet_id  INT(10),
-            to_wallet_id    INT(10) NOT NULL,
-            Type            TEXT,
-            Time            DATETIME,
-            FOREIGN KEY (to_wallet_id)   REFERENCES Wallets(Wallet_ID),
-            FOREIGN KEY (from_wallet_id) REFERENCES Wallets(Wallet_ID)
-        )
-        """)
-
-        self.conn.commit()
-
-    # -------------------------------------------------
+    # ------------------------------------
     # Wallet / Student helpers
-    # -------------------------------------------------
+    # ------------------------------------
     def generate_unique_wallet_id(self):
         """Generate a unique 10-digit Wallet ID."""
         with self.SessionLocal() as session:
@@ -103,7 +137,7 @@ class DataCenter:
         """Check if a Student ID already exists."""
         with self.SessionLocal() as session:
             return session.query(
-                exists().where(Student.Student_ID == student_id)
+            exists().where(Student.Student_ID == student_id)
             ).scalar()
 
     def check_email_exists(self, email: str) -> bool:
@@ -128,28 +162,25 @@ class DataCenter:
         Returns a list of tuples:
         (Student_ID, FirstName, LastName, Email, Wallet_ID, Balance)
         """
-        result = []
-        self.cur.execute(
-            """
-            SELECT 
-                S.Student_ID,
-                S.FirstName,
-                S.LastName,
-                S.email,
-                W.Wallet_ID,
-                W.Balance
-            FROM Students S
-            JOIN Wallets W ON S.wallet_id = W.Wallet_ID
-            ORDER BY S.Student_ID
-            """
-        )
-        for row in self.cur:
-            result.append(row)
-        return result
+        with self.SessionLocal() as session:
+            rows = (
+                session.query(
+                    Student.Student_ID,
+                    Student.FirstName,
+                    Student.LastName,
+                    Student.email,
+                    Wallet.Wallet_ID,
+                    Wallet.Balance,
+                )
+                .join(Wallet, Student.wallet_id == Wallet.Wallet_ID)
+                .order_by(Student.Student_ID)
+                .all()
+            )
+            return rows
 
-    # -------------------------------------------------
+    # ------------------------------------
     # Manager helpers
-    # -------------------------------------------------
+    # ------------------------------------
     def add_initial_manager(self):
         """
         Adds one default manager if Managers table is empty.
@@ -226,43 +257,46 @@ class DataCenter:
         """
         Inserts:
         1) Wallet row
-        2) Student row3) KSUEntity row (student also as entity)
+        2) Student row
+        3) KSUEntity row (student also as entity)
         """
         with self.SessionLocal() as session:
             try:
                 wallet_id = self.generate_unique_wallet_id()
                 create_time = datetime.now()
 
-            # 1) Wallet
-            self.cur.execute(
-                """
-                INSERT INTO Wallets (Wallet_ID, Owner_type, Balance, Create_time)
-                VALUES (?, ?, ?, ?)
-                """,
-                (wallet_id, "student", initial_balance, create_time)
-            )
+                # 1) Wallet
+                wallet = Wallet(
+                    Wallet_ID=wallet_id,
+                    Owner_type="student",
+                    Balance=initial_balance,
+                    Create_time=create_time,
+                )
+                session.add(wallet)
 
-            # 2) Student
-            self.cur.execute(
-                """
-                INSERT INTO Students (Student_ID, FirstName, LastName, email, PhoneNo, wallet_id, password)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-                """,
-                (student_id, first_name, last_name, email, phone_no, wallet_id, hashed_password)
-            )
+                # 2) Student
+                student = Student(
+                    Student_ID=student_id,
+                    FirstName=first_name,
+                    LastName=last_name,
+                    email=email,
+                    PhoneNo=phone_no,
+                    wallet_id=wallet_id,
+                    password=hashed_password,
+                )
+                session.add(student)
 
-            # 3) Entity (student also saved as an entity)
-            full_name = f"{first_name} {last_name}"
-            self.cur.execute(
-                """
-                INSERT INTO KSU_Entities (Entity_ID, Name, wallet_id)
-                VALUES (?, ?, ?)
-                """,
-                (student_id, full_name, wallet_id)
-            )
+                # 3) Entity
+                full_name = f"{first_name} {last_name}"
+                entity = KSUEntity(
+                    Entity_ID=student_id,
+                    Name=full_name,
+                    wallet_id=wallet_id,
+                )
+                session.add(entity)
 
-            self.conn.commit()
-            return True
+                session.commit()
+                return True
 
             except Exception as e:
                 session.rollback()
