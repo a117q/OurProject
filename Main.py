@@ -20,7 +20,7 @@ class MainApp:
         for widget in self.root.winfo_children():
             widget.destroy()
 
-    # ==================== Student and Admin Callbacks ===============================
+    #  Student and Admin Callbacks ===============================
     
     
     def show_student_window(self, student_id):
