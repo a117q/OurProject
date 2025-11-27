@@ -12,22 +12,20 @@ from sqlalchemy import (
     ForeignKey,
     CheckConstraint,
     Text,
-    select,
     exists,
 )
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 
-# -------------------------
-# SQLAlchemy Base & Models
-# -------------------------
-
 Base = declarative_base()
 
 
+# =======================
+#   ORM MODELS
+# =======================
 class Wallet(Base):
     __tablename__ = "Wallets"
 
-    Wallet_ID = Column(Integer, primary_key=True)  # 10-digit int
+    Wallet_ID = Column(Integer, primary_key=True)
     Owner_type = Column(String, nullable=False)    # 'student' or 'ksu'
     Balance = Column(Float, default=0)
     Create_time = Column(DateTime)
@@ -59,7 +57,7 @@ class Manager(Base):
 class Student(Base):
     __tablename__ = "Students"
 
-    Student_ID = Column(Integer, primary_key=True)  # 10-digit int
+    Student_ID = Column(Integer, primary_key=True)   # 10-digit
     FirstName = Column(String, nullable=False)
     LastName = Column(String, nullable=False)
     email = Column(String, nullable=False)
@@ -77,7 +75,7 @@ class Student(Base):
 class KSUEntity(Base):
     __tablename__ = "KSU_Entities"
 
-    Entity_ID = Column(Integer, primary_key=True)  # 10-digit int
+    Entity_ID = Column(Integer, primary_key=True)
     Name = Column(String, nullable=False)
     wallet_id = Column(Integer, ForeignKey("Wallets.Wallet_ID"))
 
@@ -105,25 +103,19 @@ class Transaction(Base):
     )
 
 
-# -------------------------
-# DataCenter using ORM
-# -------------------------
-
+# =======================
+#   DATACENTER CLASS
+# =======================
 class DataCenter:
     def __init__(self, db_url="sqlite:///Database.db"):
-        """
-        Connect to database and create tables if they don't exist.
-        Example db_url: 'sqlite:///Database.db'
-        """
+        # connect using SQLAlchemy
         self.engine = create_engine(db_url, echo=False, future=True)
         Base.metadata.create_all(self.engine)
         self.SessionLocal = sessionmaker(bind=self.engine, expire_on_commit=False)
 
-    # ------------------------------------
-    # Wallet / Student helpers
-    # ------------------------------------
+    # -------- Wallet / Student helpers --------
     def generate_unique_wallet_id(self):
-        """Generate a unique 10-digit Wallet ID."""
+        """Generates a unique 10-digit Wallet ID."""
         with self.SessionLocal() as session:
             while True:
                 wallet_id = random.randint(1000000000, 9999999999)
@@ -133,22 +125,22 @@ class DataCenter:
                 if not exists_q:
                     return wallet_id
 
-    def check_student_id_exists(self, student_id: int) -> bool:
-        """Check if a Student ID already exists."""
+    def check_student_id_exists(self, student_id):
+        """Checks if a Student ID is already in the database."""
         with self.SessionLocal() as session:
             return session.query(
-            exists().where(Student.Student_ID == student_id)
+                exists().where(Student.Student_ID == student_id)
             ).scalar()
 
-    def check_email_exists(self, email: str) -> bool:
-        """Check if an email is already used by a student."""
+    def check_email_exists(self, email):
+        """Checks if an email is already used by a student."""
         with self.SessionLocal() as session:
             return session.query(
                 exists().where(Student.email == email)
             ).scalar()
 
-    def check_student_login(self, student_id: int, hashed_password: str) -> bool:
-        """Returns True if (Student_ID, password) match."""
+    def check_student_login(self, student_id, hashed_password):
+        """Returns True if (Student_ID, password) match in Students table."""
         with self.SessionLocal() as session:
             return session.query(
                 exists().where(
@@ -178,14 +170,12 @@ class DataCenter:
             )
             return rows
 
-    # ------------------------------------
-    # Manager helpers
-    # ------------------------------------
+    # -------- Manager helpers --------
     def add_initial_manager(self):
         """
         Adds one default manager if Managers table is empty.
         ID:        1234567890
-        Password:  ad223344 (SHA-256)
+        Password:  ad223344 (stored as SHA-256 hash)
         Name:      Admin User
         """
         with self.SessionLocal() as session:
@@ -208,8 +198,8 @@ class DataCenter:
             session.add(m)
             session.commit()
 
-    def check_manager_login(self, manager_id: str, hashed_password: str) -> bool:
-        """Returns True if (Manager_ID, Password) match."""
+    def check_manager_login(self, manager_id, hashed_password):
+        """Returns True if (Manager_ID, Password) match in Managers table."""
         with self.SessionLocal() as session:
             return session.query(
                 exists().where(
@@ -218,8 +208,15 @@ class DataCenter:
                 )
             ).scalar()
 
-    def get_manager_info(self, manager_id: str):
-        """Return dict with manager info or None."""
+    def get_manager_info(self, manager_id):
+        """
+        Returns dict with manager info, or None if not found:
+        {
+            'manager_id': ...,
+            'first_name': ...,
+            'last_name': ...
+        }
+        """
         with self.SessionLocal() as session:
             m = (
                 session.query(Manager)
@@ -234,31 +231,29 @@ class DataCenter:
                 "last_name": m.LastName,
             }
 
-    def check_manager_id_exists(self, manager_id: str) -> bool:
+    def check_manager_id_exists(self, manager_id):
         """Returns True if this ID already exists in Managers table."""
         with self.SessionLocal() as session:
             return session.query(
                 exists().where(Manager.Manager_ID == manager_id)
             ).scalar()
 
-    # ------------------------------------
-    # Insert student + wallet + entity
-    # ------------------------------------
+    # -------- Insert student + wallet + entity --------
     def add_student_and_wallet(
         self,
-        student_id: int,
-        first_name: str,
-        last_name: str,
-        email: str,
-        phone_no: int,
-        hashed_password: str,
-        initial_balance: float,
-    ) -> bool:
+        student_id,
+        first_name,
+        last_name,
+        email,
+        phone_no,
+        hashed_password,
+        initial_balance,
+    ):
         """
         Inserts:
-        1) Wallet row
-        2) Student row
-        3) KSUEntity row (student also as entity)
+        1) Wallet row in Wallets
+        2) Student row in Students
+        3) Entity row in KSU_Entities (so every student appears as an entity too)
         """
         with self.SessionLocal() as session:
             try:
@@ -266,6 +261,7 @@ class DataCenter:
                 create_time = datetime.now()
 
                 # 1) Wallet
+
                 wallet = Wallet(
                     Wallet_ID=wallet_id,
                     Owner_type="student",
@@ -286,7 +282,7 @@ class DataCenter:
                 )
                 session.add(student)
 
-                # 3) Entity
+                # 3) Entity (student also saved as an entity)
                 full_name = f"{first_name} {last_name}"
                 entity = KSUEntity(
                     Entity_ID=student_id,
@@ -298,11 +294,10 @@ class DataCenter:
                 session.commit()
                 return True
 
-            except Exception as e:
+            except Exception:
                 session.rollback()
-                raise e
+                raise
 
-    # ------------------------------------
+    # -------- Close engine --------
     def close(self):
-        """For compatibility with old code (nothing special needed here)."""
         self.engine.dispose()
