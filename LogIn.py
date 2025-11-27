@@ -7,8 +7,7 @@ class LogIn:
     def __init__(self, root, show_signup_window, show_student_cb, show_admin_cb, is_admin_mode=False):
         self.root = root
         self.dc = DataCenter()
-
-        # callbacks from MainApp
+        
         self.show_signup_window = show_signup_window   # open signup / role selection
         self.show_student_cb = show_student_cb         # when student logs in
         self.show_admin_cb = show_admin_cb             # when manager logs in
@@ -21,9 +20,6 @@ class LogIn:
 
         self.create_widgets()
 
-    # -------------------------------------------------------
-    # UI
-    # -------------------------------------------------------
     def create_widgets(self):
         main_frame = tk.Frame(self.root, padx=20, pady=20, bg="#B7D4FF")
         main_frame.pack(expand=True, fill="both")
@@ -74,23 +70,18 @@ class LogIn:
             bg="#B7D4FF"
         ).pack(pady=10)
 
-    # -------------------------------------------------------
-    # Helpers
-    # -------------------------------------------------------
+    #-------------------------------------------------------
     def toggle_password(self):
         if self.show_var.get():
             self.password_entry.config(show="")
         else:
             self.password_entry.config(show="*")
-
-    # -------------------------------------------------------
-    # Login Logic
-    # -------------------------------------------------------
+            
     def check_login(self):
         id_text = self.id_entry.get().strip()
         password = self.password_entry.get()
 
-        # 1) Basic validation
+        
         if not id_text or not password:
             messagebox.showwarning("Error", "Please enter both ID and password.")
             return
@@ -103,7 +94,6 @@ class LogIn:
         student_id_int = int(id_text)   # for Students table (INT)
         manager_id_str = id_text        # for Managers table (TEXT)
 
-        # 2) Hash password
         try:
             h_pwd = hashlib.sha256(password.encode("utf-8")).hexdigest()
         except Exception as e:
@@ -111,7 +101,7 @@ class LogIn:
             return
 
         # ==========================================================
-        # 3) Admin (manager) check using Managers table
+        # Admin checking
         # ==========================================================
         try:
             if self.dc.check_manager_login(manager_id_str, h_pwd):
@@ -131,7 +121,7 @@ class LogIn:
             return
 
         # ==========================================================
-        # 4) Student check using Students table
+        #Student checking
         # ==========================================================
         try:
             if self.dc.check_student_login(student_id_int, h_pwd):
@@ -142,9 +132,7 @@ class LogIn:
             messagebox.showerror("Database Error", f"Error checking student login:\n{e}")
             return
 
-        # ==========================================================
-        # 5) If both failed → show appropriate error
-        # ==========================================================
+        #====================================================
         try:
             if self.dc.check_student_id_exists(student_id_int):
                 messagebox.showerror("Error", "Incorrect password.")

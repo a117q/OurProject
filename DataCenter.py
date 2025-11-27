@@ -49,8 +49,6 @@ class DataCenter:
             FOREIGN KEY (wallet_id) REFERENCES Wallets(Wallet_ID)
         )
         """)
-
-        # Ensure password column exists (for old DBs)
         has_password = False
         for row in self.cur.execute("PRAGMA table_info(Students)"):
             if len(row) > 1 and row[1] == "password":
@@ -84,10 +82,8 @@ class DataCenter:
         """)
 
         self.conn.commit()
-
-    # -------------------------------------------------
-    # Wallet / Student helpers
-    # -------------------------------------------------
+        
+    ####################
     def generate_unique_wallet_id(self):
         """Generates a unique 10-digit Wallet ID."""
         while True:
@@ -152,10 +148,7 @@ class DataCenter:
         for row in self.cur:
             result.append(row)
         return result
-
-    # -------------------------------------------------
-    # Manager helpers
-    # -------------------------------------------------
+    
     def add_initial_manager(self):
         """
         Adds one default manager if Managers table is empty.
@@ -244,7 +237,7 @@ class DataCenter:
             wallet_id = self.generate_unique_wallet_id()
             create_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-            # 1) Wallet
+            #Wallet
             self.cur.execute(
                 """
                 INSERT INTO Wallets (Wallet_ID, Owner_type, Balance, Create_time)
@@ -253,7 +246,7 @@ class DataCenter:
                 (wallet_id, "student", initial_balance, create_time)
             )
 
-            # 2) Student
+            #Student
             self.cur.execute(
                 """
                 INSERT INTO Students (Student_ID, FirstName, LastName, email, PhoneNo, wallet_id, password)
@@ -262,7 +255,7 @@ class DataCenter:
                 (student_id, first_name, last_name, email, phone_no, wallet_id, hashed_password)
             )
 
-            # 3) Entity (student also saved as an entity)
+            #Entity
             full_name = f"{first_name} {last_name}"
             self.cur.execute(
                 """

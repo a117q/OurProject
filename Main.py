@@ -12,17 +12,13 @@ class MainApp:
         self.root.geometry("550x550") 
 
         self.dc = DataCenter()
-        # ✅ لا ترسل أي باراميترات لـ add_initial_manager
+        #add_initial_manager
         self.dc.add_initial_manager()
-        
-        # نقطة البداية: شاشة الدخول
         self.show_login_window() 
         
     def clear_window(self):
         for widget in self.root.winfo_children():
             widget.destroy()
-
-    #  Student and Admin Callbacks ===============================
     
     def show_student_window(self, student_id):
         """Displays the Student Wallet Window after successful login."""
@@ -30,13 +26,12 @@ class MainApp:
         self.student_wallet_window = StudentWalletWindow(
             root=self.root,
             student_id=student_id,
-            go_back_callback=self.show_login_window  # العودة لشاشة الدخول
+            go_back_callback=self.show_login_window 
         )
 
     def show_admin_window(self):
         """Displays the Admin (Manager) Window after successful login."""
         self.clear_window()
-        # لو AdminsWindow يستقبل باراميترات إضافية عدلي التوقيع هنا
         self.admin_window = AdminsWindow(
             self.root,
             go_back_callback=self.show_login_window  # العودة لشاشة الدخول
