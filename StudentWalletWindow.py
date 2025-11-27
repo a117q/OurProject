@@ -12,7 +12,6 @@ class StudentWalletWindow:
         self.go_back_callback = go_back_callback
         self.dc = DataCenter()
 
-        #get the wallet id and balance
         self.student_info = self._get_student_info()
 
         self.root.title("KSU Wallet - Student Wallet")
@@ -21,15 +20,9 @@ class StudentWalletWindow:
 
         self.create_widgets()
 
-    # -----------------------------------------
-    #get student info (ID + wallet + balance)
-    # -----------------------------------------
     def _get_student_info(self):
-        
         try:
             rows = self.dc.get_all_students_with_wallet()
-            # (Student_ID, FirstName, LastName, Email, Wallet_ID, Balance)
-
             for row in rows:
                 student_id = row[0]
                 wallet_id = row[4]
@@ -42,21 +35,17 @@ class StudentWalletWindow:
                         "balance": balance,
                     }
 
-            messagebox.showerror("Error", "Could not retrieve wallet information.")
+            messagebox.showerror("Error", "Unable to retrieve wallet information.")
             return None
 
         except Exception as e:
-            messagebox.showerror("Database Error", f"Error retrieving student info:\n{e}")
+            messagebox.showerror("Database Error", f"Database Error: Unable to load student information:\n{e}")
             return None
-
-    # -----------------------------------------
-    #user interfac
-    # -----------------------------------------
+#the interfac
     def create_widgets(self):
         main_frame = tk.Frame(self.root, padx=30, pady=30, bg="#B7D4FF")
         main_frame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
-        #title
         tk.Label(
             main_frame,
             text="Student Wallet Dashboard",
@@ -64,14 +53,13 @@ class StudentWalletWindow:
             bg="#B7D4FF",
         ).grid(row=0, column=0, columnspan=2, pady=(0, 15))
 
-        #wallet line
         if self.student_info:
             wallet_text = (
                 f"Wallet ID: {self.student_info['wallet_id']}   |   "
                 f"Balance: {self.student_info['balance']:.2f} SR"
             )
         else:
-            wallet_text = "Wallet information not available."
+            wallet_text = "Wallet information is currently unavailable."
 
         self.header_info_label = tk.Label(
             main_frame,
@@ -87,7 +75,6 @@ class StudentWalletWindow:
             row=1, column=0, columnspan=2, sticky="ew", pady=(0, 20)
         )
 
-        #payment
         transfer_frame = tk.LabelFrame(
             main_frame, text="Make a Payment", padx=20, pady=10, bg="#B7D4FF"
         )
@@ -126,15 +113,12 @@ class StudentWalletWindow:
             fg="white",
         ).grid(row=3, column=0, columnspan=2, pady=10, sticky="ew")
 
-    # -----------------------------------------
-    #Payment action using SQLAlchemy
-    # -----------------------------------------
     def pay_action(self):
         target_wallet_str = self.target_wallet_entry.get().strip()
         amount_str = self.amount_entry.get().strip()
 
         if not target_wallet_str or not amount_str:
-            messagebox.showerror("Error", "Please fill in all payment fields.")
+            messagebox.showerror("Error", "Please complete all required payment fields.")
             return
 
         try:
@@ -143,62 +127,52 @@ class StudentWalletWindow:
         except ValueError:
             messagebox.showerror(
                 "Error",
-                "Wallet Number must be digits and Amount must be a valid number.",
+                "The wallet number must contain digits only, and the amount must be a valid numeric value.",
             )
             return
-
+# amount cannot be zero or less
         if amount <= 0:
-            messagebox.showerror("Error", "Amount must be greater than zero.")
+            messagebox.showerror("Error", "The amount must be greater than zero.")
             return
 
         if not self.student_info:
-            messagebox.showerror("Error", "No wallet information available.")
+            messagebox.showerror("Error", "Wallet information is currently unavailable.")
             return
 
         source_wallet_id = self.student_info["wallet_id"]
         current_balance = self.student_info["balance"]
 
         if target_wallet_id == source_wallet_id:
-            messagebox.showerror("Error", "Cannot transfer to your own wallet.")
+            messagebox.showerror("Error", "You cannot make a transfer to your own wallet.")
             return
 
         if amount > current_balance:
-            messagebox.showerror(
-                "Error", "There is not enough money (Insufficient Balance)."
-            )
+            messagebox.showerror("Error", "Insufficient balance to complete this transaction.")
             return
 
         try:
             with self.dc.SessionLocal() as session:
-                #get source and target wallets
                 source_wallet = session.get(Wallet, source_wallet_id)
                 target_wallet = session.get(Wallet, target_wallet_id)
 
                 if target_wallet is None:
-                    messagebox.showerror(
-                        "Error", "The entered Wallet Number does not exist."
-                    )
+                    messagebox.showerror("Error", "The wallet number you entered does not exist.")
                     return
 
                 if source_wallet is None:
-                    messagebox.showerror(
-                        "Error", "Source wallet could not be found."
-                    )
+                    messagebox.showerror("Error", "The source wallet could not be located.")
                     return
 
                 if source_wallet.Balance < amount:
                     messagebox.showerror(
                         "Error",
-                        "There is not enough money (Insufficient Balance).",
+                        "Insufficient balance to complete this transaction.",
                     )
                     return
 
-                
-                #Update balances
                 source_wallet.Balance -= amount
                 target_wallet.Balance += amount
 
-                #add transaction (Transaction_ID auto)
                 tx = Transaction(
                     from_wallet_id=source_wallet_id,
                     to_wallet_id=target_wallet_id,
@@ -211,7 +185,6 @@ class StudentWalletWindow:
 
                 new_source_balance = source_wallet.Balance
 
-            #update local state and GUI
             self.student_info["balance"] = new_source_balance
             self.balance_label_update()
             self.target_wallet_entry.delete(0, tk.END)
@@ -219,12 +192,12 @@ class StudentWalletWindow:
 
             messagebox.showinfo(
                 "Success",
-                f"Payment of {amount:.2f} SR to Wallet {target_wallet_id} successful.\n"
+                f"The payment of {amount:.2f} SR to wallet {target_wallet_id} was completed successfully.\n"
                 f"Your new balance is {new_source_balance:.2f} SR.",
             )
 
         except Exception as e:
-            messagebox.showerror("Database Error", f"Transaction failed:\n{e}")
+            messagebox.showerror("Database Error", f"Transaction could not be completed:\n{e}")
 
     def balance_label_update(self):
         wallet_text = (
