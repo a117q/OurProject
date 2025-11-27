@@ -12,7 +12,7 @@ class StudentWalletWindow:
         self.go_back_callback = go_back_callback
         self.dc = DataCenter()
 
-        # Get wallet id + balance
+        #get the wallet id and balance
         self.student_info = self._get_student_info()
 
         self.root.title("KSU Wallet - Student Wallet")
@@ -22,19 +22,12 @@ class StudentWalletWindow:
         self.create_widgets()
 
     # -----------------------------------------
-    # Get student info (ID + wallet + balance)
+    #get student info (ID + wallet + balance)
     # -----------------------------------------
     def _get_student_info(self):
-        """
-        Retrieves:
-        - Student_ID
-        - Wallet_ID
-        - Balance
-        Using DataCenter helpers (SQLAlchemy inside DataCenter).
-        """
+        
         try:
             rows = self.dc.get_all_students_with_wallet()
-            # rows شكلها:
             # (Student_ID, FirstName, LastName, Email, Wallet_ID, Balance)
 
             for row in rows:
@@ -57,13 +50,13 @@ class StudentWalletWindow:
             return None
 
     # -----------------------------------------
-    # UI
+    #user interfac
     # -----------------------------------------
     def create_widgets(self):
         main_frame = tk.Frame(self.root, padx=30, pady=30, bg="#B7D4FF")
         main_frame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
-        # Title
+        #title
         tk.Label(
             main_frame,
             text="Student Wallet Dashboard",
@@ -71,7 +64,7 @@ class StudentWalletWindow:
             bg="#B7D4FF",
         ).grid(row=0, column=0, columnspan=2, pady=(0, 15))
 
-        # Wallet line
+        #wallet line
         if self.student_info:
             wallet_text = (
                 f"Wallet ID: {self.student_info['wallet_id']}   |   "
@@ -94,7 +87,7 @@ class StudentWalletWindow:
             row=1, column=0, columnspan=2, sticky="ew", pady=(0, 20)
         )
 
-        # ===== Payment Fields =====
+        #payment
         transfer_frame = tk.LabelFrame(
             main_frame, text="Make a Payment", padx=20, pady=10, bg="#B7D4FF"
         )
@@ -134,7 +127,7 @@ class StudentWalletWindow:
         ).grid(row=3, column=0, columnspan=2, pady=10, sticky="ew")
 
     # -----------------------------------------
-    # Payment Logic using SQLAlchemy
+    #Payment action using SQLAlchemy
     # -----------------------------------------
     def pay_action(self):
         target_wallet_str = self.target_wallet_entry.get().strip()
@@ -177,7 +170,7 @@ class StudentWalletWindow:
 
         try:
             with self.dc.SessionLocal() as session:
-                # Get source and target wallets
+                #get source and target wallets
                 source_wallet = session.get(Wallet, source_wallet_id)
                 target_wallet = session.get(Wallet, target_wallet_id)
 
@@ -200,11 +193,12 @@ class StudentWalletWindow:
                     )
                     return
 
-                # Update balances
+                
+                #Update balances
                 source_wallet.Balance -= amount
                 target_wallet.Balance += amount
 
-                # Add transaction (Transaction_ID auto)
+                #add transaction (Transaction_ID auto)
                 tx = Transaction(
                     from_wallet_id=source_wallet_id,
                     to_wallet_id=target_wallet_id,
@@ -217,7 +211,7 @@ class StudentWalletWindow:
 
                 new_source_balance = source_wallet.Balance
 
-            # Update local state + GUI
+            #update local state and GUI
             self.student_info["balance"] = new_source_balance
             self.balance_label_update()
             self.target_wallet_entry.delete(0, tk.END)
