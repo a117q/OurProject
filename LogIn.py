@@ -91,8 +91,8 @@ class LogIn:
             messagebox.showerror("Error", "ID must contain exactly 10 digits.")
             return
 
-        student_id_int = int(id_text)   # for Students table (INT)
-        manager_id_str = id_text        # for Managers table (TEXT)
+        student_id_int = int(id_text)  
+        manager_id_str = id_text        
 
         try:
             h_pwd = hashlib.sha256(password.encode("utf-8")).hexdigest()
@@ -100,9 +100,9 @@ class LogIn:
             messagebox.showerror("Error", f"An error occurred during password hashing: {e}")
             return
 
-        # ==========================================================
+
         # Admin checking
-        # ==========================================================
+
         try:
             if self.dc.check_manager_login(manager_id_str, h_pwd):
                 manager_info = self.dc.get_manager_info(manager_id_str)
@@ -117,9 +117,8 @@ class LogIn:
             messagebox.showerror("Database Error", f"Error checking admin login:\n{e}")
             return
 
-        # ==========================================================
         #Student checking
-        # ==========================================================
+
         try:
             if self.dc.check_student_login(student_id_int, h_pwd):
                 messagebox.showinfo("Success", "Login successful (Student).")
@@ -129,7 +128,7 @@ class LogIn:
             messagebox.showerror("Database Error", f"Error checking student login:\n{e}")
             return
 
-        #====================================================
+
         try:
             if self.dc.check_student_id_exists(student_id_int):
                 messagebox.showerror("Error", "Incorrect password.")
