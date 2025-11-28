@@ -106,6 +106,8 @@ class SignupWindow:
         else:
             self.fields["PWD"].config(show="*")
             self.fields["CPWD"].config(show="*")
+
+            
     def validate_inputs(self, data):
 
         # Passwords match
