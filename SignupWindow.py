@@ -99,7 +99,6 @@ class SignupWindow:
         ).grid(row=row_counter, column=0, columnspan=2, pady=10)
 
     # ---------------------------------------------------
-
     def toggle_password(self):
         """Toggles the visibility of the Password and Confirm Password fields."""
         if self.show_var.get():

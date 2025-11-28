@@ -130,7 +130,8 @@ class StudentWalletWindow:
                 "The wallet number must contain digits only, and the amount must be a valid numeric value.",
             )
             return
-# amount cannot be zero or less
+        
+        # amount cannot be zero or less
         if amount <= 0:
             messagebox.showerror("Error", "The amount must be greater than zero.")
             return

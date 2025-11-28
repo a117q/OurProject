@@ -111,9 +111,6 @@ class LogIn:
                     messagebox.showinfo("Success", f"Login successful (Admin): {full_name}")
                 else:
                     messagebox.showinfo("Success", "Login successful (Admin).")
-
-                # ⚠️ IMPORTANT: callback with NO parameters,
-                # because MainApp.show_admin_window(self) expects only self.
                 self.show_admin_cb()
                 return
         except Exception as e:

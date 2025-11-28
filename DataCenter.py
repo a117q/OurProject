@@ -48,8 +48,7 @@ class Manager(Base):
     Password = Column(Text, nullable=False)
     FirstName = Column(String, nullable=False)
     LastName = Column(String, nullable=False)
-
-
+    
 class Student(Base):
     __tablename__ = "Students"
 

@@ -140,7 +140,6 @@ class AdminsWindow:
         )
 
     ##------------------Add Tab------------------
-
     def create_add_tab(self):
         title = tk.Label(self.add_tab, text="Add KSU Entity", font=("Arial", 14))
         title.pack(pady=10)

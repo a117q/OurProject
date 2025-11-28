@@ -21,7 +21,6 @@ class MainApp:
         for widget in self.root.winfo_children():
             widget.destroy()
 
-
     #-----------------------------Student screen---------------------------
     def show_student_window(self, student_id):
 
