@@ -41,7 +41,7 @@ class MainApp:
 
         self.admin_window = AdminsWindow(
             self.root,
-            go_back_callback=self.show_login_window  #back to log in window
+            go_back_callback=self.show_signup_window  #back to sign up window
         )
 
 

@@ -9,7 +9,7 @@ class AdminsWindow:
         self.go_back_callback = go_back_callback
 
         self.root.title("Admin Window")
-        self.root.geometry("550x550")
+        self.root.geometry("700x700")
 
         # SQLAlchemy DataCenter
         self.dc = DataCenter()
@@ -33,7 +33,7 @@ class AdminsWindow:
         # loading all entities (students and KSU entities)
         self.load_entities()
 
-    #------------------View Tab#------------------
+    #------------------View Tab------------------
 
     def create_view_tab(self):
         title = tk.Label(self.view_tab, text="View KSU Entities & Students", font=("Arial", 14))
@@ -102,11 +102,10 @@ class AdminsWindow:
                         {
                             "entity_id": entity_id,
                             "name": name,
-
                             "type": type_str,
                             "wallet_id": wallet_id,
                             "balance": balance,
-                            "created": created_str, 
+                            "created": created_str,
                         }
                     )
                     self.entities_listbox.insert(tk.END, display)
@@ -139,7 +138,7 @@ class AdminsWindow:
             f"Current Balance: {balance} SR"
         )
 
-    ##------------------Add Tab------------------
+    #------------------Add Tab------------------
     def create_add_tab(self):
         title = tk.Label(self.add_tab, text="Add KSU Entity", font=("Arial", 14))
         title.pack(pady=10)
@@ -175,7 +174,7 @@ class AdminsWindow:
 
                 # new unique wallet id with 10 digits from the datacenter helper
                 wallet_id = self.dc.generate_unique_wallet_id()
-                create_time = datetime.now()   
+                create_time = datetime.now()
 
                 # insert wallet
                 wallet = Wallet(
@@ -226,11 +225,12 @@ class AdminsWindow:
         )
         cashout_btn.pack(pady=10)
 
+        #back button to sign up window
         back_btn = tk.Button(self.manage_tab, text="Back", command=self.go_back)
         back_btn.pack(pady=20)
 
     def pay_stipends(self):
-        # adding 1000 SR to all student wallets
+
         try:
             with self.dc.SessionLocal() as session:
                 session.query(Wallet).filter(
@@ -249,7 +249,6 @@ class AdminsWindow:
             )
 
     def clear_balances(self):
-        # make all entity wallet balances to 0 (Cash Out)
         try:
             with self.dc.SessionLocal() as session:
                 session.query(Wallet).filter(
@@ -260,7 +259,6 @@ class AdminsWindow:
                 )
                 session.commit()
 
-            # update the window
             self.load_entities()
 
             messagebox.showinfo(
@@ -272,9 +270,9 @@ class AdminsWindow:
                 "Error", f"An error occurred while clearing balances:\n{e}"
             )
 
-    def go_back(self):
-        # back button , go to signup window
+
+    def go_back(self): # go BACK to sign up window 
         if self.go_back_callback:
             self.go_back_callback()
-        else:
+        else :
             self.root.destroy()
