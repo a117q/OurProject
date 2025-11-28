@@ -210,7 +210,7 @@ class AdminsWindow:
         except Exception as e:
             messagebox.showerror("Error", f"An error occurred while adding the entity:\n{e}")
 
-    #------------------Manage Tab#------------------
+    #------------------Manage Tab------------------
 
     def create_manage_tab(self):
         title = tk.Label(self.manage_tab, text="Manage", font=("Arial", 14))
