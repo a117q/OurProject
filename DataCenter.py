@@ -98,17 +98,14 @@ class Transaction(Base):
     )
 
 
-# =======================
-#   DATACENTER CLASS
-# =======================
 class DataCenter:
     def __init__(self, db_url="sqlite:///Database.db"):
-        # connect using SQLAlchemy
+        #SQLAlchemy
         self.engine = create_engine(db_url, echo=False, future=True)
         Base.metadata.create_all(self.engine)
         self.SessionLocal = sessionmaker(bind=self.engine, expire_on_commit=False)
 
-    # -------- Wallet / Student helpers --------
+    # Wallet / Student helpers 
     def generate_unique_wallet_id(self):
         """Generates a unique 10-digit Wallet ID."""
         with self.SessionLocal() as session:
@@ -165,7 +162,7 @@ class DataCenter:
             )
             return rows
 
-    # -------- Manager helpers --------
+    # Manager helpers 
     def add_initial_manager(self):
         """
         Adds one default manager if Managers table is empty.
@@ -233,7 +230,7 @@ class DataCenter:
                 exists().where(Manager.Manager_ID == manager_id)
             ).scalar()
 
-    # -------- Insert student + wallet + entity --------
+    # Insert student + wallet + entity 
     def add_student_and_wallet(
         self,
         student_id,
@@ -293,7 +290,6 @@ class DataCenter:
                 session.rollback()
                 raise
 
-    # -------- Close engine --------
     def close(self):
         """For compatibility with old code (nothing special needed here)."""
         self.engine.dispose()
