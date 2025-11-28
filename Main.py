@@ -21,7 +21,8 @@ class MainApp:
         for widget in self.root.winfo_children():
             widget.destroy()
 
-    #-----------------------------Student screen---------------------------
+    #Student screen
+    
     def show_student_window(self, student_id):
 
         #displaying student wallet window after log in 
@@ -32,7 +33,8 @@ class MainApp:
             go_back_callback=self.show_login_window 
         )
 
-    #--------------------Admin screen-----------------------------
+    #Admin screen
+
     def show_admin_window(self):
         #displaying the admin window after log in
         self.clear_window()
@@ -43,7 +45,7 @@ class MainApp:
         )
 
 
-    #-----------------------------Sign Up screen-----------------------------
+    #Sign Up screen
 
     def show_signup_window(self):
         self.clear_window()
@@ -54,7 +56,7 @@ class MainApp:
         )
 
 
-    #-----------------------------Login screen-----------------------------
+    #Login screen
 
     def show_login_window(self):
         self.clear_window()
