@@ -8,7 +8,7 @@ class LogIn:
         self.root = root
         self.dc = DataCenter()
         
-        self.show_signup_window = show_signup_window   # open signup / role selection
+        self.show_signup_window = show_signup_window   # open signup 
         self.show_student_cb = show_student_cb         # when student logs in
         self.show_admin_cb = show_admin_cb             # when manager logs in
 

@@ -25,7 +25,7 @@ class MainApp:
     #-----------------------------Student screen---------------------------
     def show_student_window(self, student_id):
 
-        #displayin student wallet window after log in 
+        #displaying student wallet window after log in 
         self.clear_window()
         self.student_wallet_window = StudentWalletWindow(
             root=self.root,
@@ -35,7 +35,7 @@ class MainApp:
 
     #--------------------Admin screen-----------------------------
     def show_admin_window(self):
-        #displaying the admin(manager) window after log in
+        #displaying the admin window after log in
         self.clear_window()
 
         self.admin_window = AdminsWindow(

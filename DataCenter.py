@@ -18,13 +18,6 @@ from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 
 Base = declarative_base()
 
-# -------------------------
-# SQLAlchemy Models
-# -------------------------
-
-# =======================
-#   ORM MODELS
-# =======================
 class Wallet(Base):
     __tablename__ = "Wallets"
 
@@ -263,7 +256,7 @@ class DataCenter:
                 wallet_id = self.generate_unique_wallet_id()
                 create_time = datetime.now()
 
-                # 1) Wallet
+                #Wallet
 
                 wallet = Wallet(
                     Wallet_ID=wallet_id,
@@ -273,7 +266,7 @@ class DataCenter:
                 )
                 session.add(wallet)
 
-                # 2) Student
+                # Student
                 student = Student(
                     Student_ID=student_id,
                     FirstName=first_name,
@@ -285,7 +278,7 @@ class DataCenter:
                 )
                 session.add(student)
 
-                # 3) Entity (student also saved as an entity)
+                #Entity (student also saved as an entity)
                 full_name = f"{first_name} {last_name}"
                 entity = KSUEntity(
                     Entity_ID=student_id,

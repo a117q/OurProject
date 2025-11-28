@@ -151,8 +151,8 @@ class SignupWindow:
             messagebox.showerror("Validation Error", err_msg)
             return
 
-        # 🔹 1) Check that this ID is NOT a manager ID
-        manager_id_str = data['SID']   # Managers.Manager_ID is TEXT
+        # Check that this ID is NOT a manager ID
+        manager_id_str = data['SID'] 
         if self.dc.check_manager_id_exists(manager_id_str):
             messagebox.showerror(
                 "Error",
@@ -160,7 +160,6 @@ class SignupWindow:
             )
             return
 
-        # 🔹 2) Now treat it as a normal student ID
         std_id = int(data['SID'])
         pwd = data['PWD']
 
