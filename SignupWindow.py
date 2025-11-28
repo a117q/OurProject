@@ -98,9 +98,8 @@ class SignupWindow:
             bg="#B7D4FF"
         ).grid(row=row_counter, column=0, columnspan=2, pady=10)
 
-    # ---------------------------------------------------
+    
     def toggle_password(self):
-        """Toggles the visibility of the Password and Confirm Password fields."""
         if self.show_var.get():
             self.fields["PWD"].config(show="")
             self.fields["CPWD"].config(show="")
@@ -108,36 +107,32 @@ class SignupWindow:
             self.fields["PWD"].config(show="*")
             self.fields["CPWD"].config(show="*")
     def validate_inputs(self, data):
-        """Validates all inputs using RegEx and basic checks."""
 
         # Passwords match
         if data['PWD'] != data['CPWD']:
             return False, "Password and Confirm Password do not match."
 
-        # Student ID: exactly 10 digits
         if not re.search(r'^[0-9]{10}$', data['SID']):
             return False, "Student ID must be exactly 10 digits."
 
-        # Password: at least 8 characters (matches DB CHECK)
-        if not re.search(r'^.{8,}$', data['PWD']):
-            return False, "Password must be at least 8 characters."
+        # Password: at least 6 characters (matches DB CHECK)
+        if not re.search(r'^.{6,}$', data['PWD']):
+            return False, "Password must be at least 6 characters."
 
         # Email: XXXXXX@student.ksu.edu.sa
         email_pattern = r'^[a-zA-Z0-9._-]+@student\.ksu\.edu\.sa$'
         if not re.search(email_pattern, data['Email']):
             return False, "Email must be in the format: XXXXXX@student.ksu.edu.sa"
 
-        # Phone number: 05XXXXXXXX
         phone_pattern = r'^05[0-9]{8}$'
         if not re.search(phone_pattern, data['PhoneNo']):
             return False, "Phone Number must be in the format: 05XXXXXXXX (10 digits)."
             
         return True, "Success"
 
-    # ---------------------------------------------------
+    
 
     def submit_action(self):
-        """Handles submission, validation, hashing, and database insertion."""
         data = {key: entry.get().strip() for key, entry in self.fields.items()}
         
         # Empty field check
@@ -155,7 +150,7 @@ class SignupWindow:
         if self.dc.check_manager_id_exists(manager_id_str):
             messagebox.showerror(
                 "Error",
-                "Student cannot use this ID, pleas try deferent ID."
+                "Student cannot use this ID, pleas try different ID."
             )
             return
 
