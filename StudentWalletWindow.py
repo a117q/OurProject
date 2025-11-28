@@ -41,7 +41,9 @@ class StudentWalletWindow:
         except Exception as e:
             messagebox.showerror("Database Error", f"Database Error: Unable to load student information:\n{e}")
             return None
+        
 #the interfac
+
     def create_widgets(self):
         main_frame = tk.Frame(self.root, padx=30, pady=30, bg="#B7D4FF")
         main_frame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
@@ -131,7 +133,7 @@ class StudentWalletWindow:
             )
             return
         
-        # amount cannot be zero or less
+
         if amount <= 0:
             messagebox.showerror("Error", "The amount must be greater than zero.")
             return
