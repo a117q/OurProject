@@ -30,7 +30,7 @@ class MainApp:
         self.student_wallet_window = StudentWalletWindow(
             root=self.root,
             student_id=student_id,
-            go_back_callback=self.show_login_window 
+            go_back_callback=self.show_signup_window 
         )
 
     #Admin screen
