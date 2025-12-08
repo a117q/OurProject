@@ -106,7 +106,6 @@ class SignupWindow:
         else:
             self.fields["PWD"].config(show="*")
             self.fields["CPWD"].config(show="*")
-
             
     def validate_inputs(self, data):
 
@@ -131,9 +130,7 @@ class SignupWindow:
             return False, "Phone Number must be in the format: 05XXXXXXXX (10 digits)."
             
         return True, "Success"
-
     
-
     def submit_action(self):
         data = {key: entry.get().strip() for key, entry in self.fields.items()}
         
@@ -141,12 +138,10 @@ class SignupWindow:
         if any(not val for val in data.values()):
             messagebox.showerror("Error", "All fields are required.")
             return
-
         valid, err_msg = self.validate_inputs(data)
         if not valid:
             messagebox.showerror("Validation Error", err_msg)
             return
-
         # Check that this ID is NOT a manager ID
         manager_id_str = data['SID'] 
         if self.dc.check_manager_id_exists(manager_id_str):
@@ -155,15 +150,12 @@ class SignupWindow:
                 "Student cannot use this ID, pleas try different ID."
             )
             return
-
         std_id = int(data['SID'])
         pwd = data['PWD']
-
         # Check student ID duplication
         if self.dc.check_student_id_exists(std_id):
             messagebox.showerror("Error", f"Student ID {std_id} is already registered.")
             return
-
         # Check email duplication
         if self.dc.check_email_exists(data['Email']):
             messagebox.showerror("Error", f"Email {data['Email']} is already registered.")

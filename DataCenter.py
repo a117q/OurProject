@@ -97,7 +97,6 @@ class Transaction(Base):
         back_populates="to_transactions",
     )
 
-
 class DataCenter:
     def __init__(self, db_url="sqlite:///Database.db"):
         #SQLAlchemy
