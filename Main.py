@@ -16,7 +16,7 @@ class MainApp:
         self.dc.add_initial_manager()
         self.show_signup_window() 
         
-    #cleaning the screen before opening a new window (prevent  overlapping)
+    #cleaning the screen before opening a new window (prevent overlapping)
     def clear_window(self):
         for widget in self.root.winfo_children():
             widget.destroy()
@@ -72,3 +72,4 @@ if __name__ == "__main__":
     root = tk.Tk()
     app = MainApp(root)
     root.mainloop()
+    
