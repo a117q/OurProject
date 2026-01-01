@@ -24,3 +24,8 @@ All application data is stored in a local database file named `Database.db`.
 - Reem Alsubaie (@reemalsub) – StudentWalletWindow , DateCenter , Main.
 - Ashwaq Almuhayasin(@a117q) - SignupWindow , DataCenter , Main.
 - Reem Alshathri(@Reem74sh-DataGirlie) - Admin_window , DataCenter , Main.
+
+## Academic Notice
+This project was developed as part of an academic course at King Saud University.
+It is not intended for reuse or redistribution for coursework purposes.
+
