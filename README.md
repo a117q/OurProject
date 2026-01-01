@@ -7,14 +7,20 @@ An administrator panel is included, enabling administrators to manage student ba
 All application data is stored in a local database file named `Database.db`.
 
 ## Features
-- Student registration and login system
-- Digital wallet balance viewing
-- Administrator panel for managing balances
-- Ability to add and manage university entities
-- Database-backed data persistence
+- Student registration and login system.
+- Digital wallet balance viewing.
+- Administrator panel for managing balances.
+- Ability to add and manage university entities.
+- Database-backed data persistence.
 
 ## Technologies Used
-- Programming Language: Python
--  GUI Framework: Tkinter
-- Database: SQLite
-- ORM: SQLAlchemy
+- Programming Language: Python.
+-  GUI Framework: Tkinter.
+- Database: SQLite.
+- ORM: SQLAlchemy.
+
+## Contributors
+- Ghada Basalasel(@Ghada-120) – LogIn , DataCenter , Main.
+- Reem Alsubaie (@reemalsub) – StudentWalletWindow , DateCenter , Main.
+- Ashwaq Almuhayasin(@a117q) - SignupWindow , DataCenter , Main.
+- Reem Alshathri(@Reem74sh-DataGirlie) - Admin_window , DataCenter , Main.
